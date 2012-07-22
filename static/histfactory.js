@@ -8,12 +8,13 @@ function AddNewChannel() {
     // This function is activated by the
     // 'AddNewChannel' button (duh)
     // Create a new 'channel' DOM object
-    // and add it to the 'measurement' div
+    // and add it to the 'Channel_List' div,
+    // which is a child of the "measurement" div
 
     console.log("Adding New Channel");
 
     // First, get a handle on the measurement div
-    var measurement = document.getElementById('measurement');
+    var measurement = document.getElementById('Channel_List');
 
     // Then, create our new div (not yet attached)
     var new_channel = document.createElement('div');
