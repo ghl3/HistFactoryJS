@@ -28,6 +28,11 @@ function AddNewChannel() {
     new_channel.innerHTML += "Data:";
     new_channel.appendChild( data_input );
 
+    // Add the list of samples div
+    var sample_list = document.createElement('div');
+    sample_list.setAttribute('class', 'sample_list');
+    new_channel.appendChild( sample_list );
+    
     // Add a 'new sample' button to the channel
     var new_sample_button = document.createElement('input');
     new_sample_button.setAttribute('type','button');
@@ -45,3 +50,28 @@ function AddNewChannel() {
 $(document).ready(function() {
     $('#NewChannel').live('click', AddNewChannel)
 });
+
+
+
+function AddSampleToChannel(channel) {
+
+    console.log("Adding Sample To Channel");    
+
+    // First, get the list of samples for this channel
+    var sample_list = channel.find(".sample_list");
+    
+    // Then, add the new sample
+    var new_sample = document.createElement('div');
+    new_sample.setAttribute('class', 'sample');
+    new_sample.innerHTML = "This is a sample <br>";
+    sample_list.append(new_sample);
+    
+    console.log("Successfully added sample to channel");    
+
+}
+$(document).ready(function() {
+    $('.NewSample').live('click', function(){
+	AddSampleToChannel( $(this).parent() );
+    })
+});
+
