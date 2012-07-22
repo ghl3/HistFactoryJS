@@ -10,38 +10,40 @@
     <link rel="shortcut icon" href="/favicon.ico" >
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 
+    <!-- Include google's jquery -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+
     <!-- Include the stylesheet: -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css" media="screen">
 
-    <!-- Include google's jquery -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <!-- Include the javascript: -->
+    <script src="{{url_for('static',filename='histfactory.js')}}" type="text/javascript"/>
+
+    <!-- The d3 data rendering library -->
+    <script src="http://d3js.org/d3.v2.js"></script>
 
   </head>
 
   <body>
 
-    <div class="mainsection">
+    <header class="header">
+      My Header
+    </header>
 
-      <div class="midcol">
-      </div>
-
-      <div class="rightcol">
-      </div>
-
-
-      <div class="bar" >
-	<p>&nbsp;</p>
-      </div>
-
-
+    <div id="menu">
+      My Menu:
+      <button id="NewChannel">Add New Channel</button>
     </div>
 
-    <div id="footer" style="float: middle;">
+    <div id="measurement">
+      The Measurement
+    </div>
+
+    <footer id="footer" style="float: middle;">
       Written and maintained by George Herbert Lewis
       <br>
-    </div>
+    </footer>
 
   </body>
-
 
 </html>
