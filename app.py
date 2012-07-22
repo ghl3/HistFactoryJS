@@ -11,9 +11,6 @@ from flask import render_template
 from flask import request
 from flask import jsonify
 
-import pymongo
-import bson.objectid
-
 app = Flask(__name__)
 
 
