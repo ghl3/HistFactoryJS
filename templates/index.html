@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+
+    <title>HistFactoryJS</title>    
+
+    <meta name="keywords" content="HistFactory, ROOT, Physics, Statistics, Particle Physics, Large Hadron Collider, LHC, ATLAS" >
+    <link rel="shortcut icon" href="/favicon.ico" >
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+
+    <!-- Include the stylesheet: -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css" media="screen">
+
+    <!-- Include google's jquery -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+
+    {% block head %}
+    {% endblock %}
+
+  </head>
+
+  <body>
+
+    {% block header %}
+    {% endblock %}
+
+    <div class="mainsection">
+
+      <div class="midcol">
+	{% block middle %}
+	{% endblock %}
+      </div>
+
+      <div class="rightcol">
+	{% block middle %}
+	{% endblock %}
+      </div>
+
+
+      <div class="bar" >
+	<p>&nbsp;</p>
+      </div>
+
+
+    </div>
+
+    {% block footer %}
+    <div id="footer" style="float: middle;">
+      Written and maintained by George Herbert Lewis
+      <br>
+    </div>
+    {% endblock %}
+
+  </body>
+
+
+</html>
