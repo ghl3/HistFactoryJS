@@ -98,10 +98,10 @@ a:active { color: #900; text-decoration: underline; background-color: transparen
 
 /* The Important Sections */
 
-#measurement 
+#main
 {
   /*display:inline-block;*/
-  width: 900px;
+  width: 1000px;
   margin-left: auto ;
   margin-right: auto ;
   border: 1px solid black;
@@ -111,6 +111,13 @@ a:active { color: #900; text-decoration: underline; background-color: transparen
   min-height: 95%;
   /*float: middle;*/
   }
+
+#fit
+{ 
+  margin-left: auto ;
+  margin-right: auto ;
+  text-align: center;
+ }
 
 .channel 
 {
