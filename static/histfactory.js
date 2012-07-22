@@ -64,7 +64,19 @@ function AddSampleToChannel(channel) {
     var new_sample = document.createElement('div');
     new_sample.setAttribute('class', 'sample');
     new_sample.innerHTML = "This is a sample <br>";
+
+    // Add the 'data' input field
+    var value_input = document.createElement('input');
+    value_input.setAttribute('type',"text");
+    value_input.setAttribute('class',"value_input");
+    new_sample.innerHTML += "Value:";
+    new_sample.appendChild( value_input );
+
+
+    // Finally, add the sample to the list of samples
     sample_list.append(new_sample);
+
+
     
     console.log("Successfully added sample to channel");    
 
