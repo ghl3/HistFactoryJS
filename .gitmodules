@@ -1,0 +1,3 @@
+[submodule "static/flot"]
+	path = static/flot
+	url = git://github.com/flot/flot.git

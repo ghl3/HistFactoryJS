@@ -40,14 +40,60 @@ footer
 #menu 
 {
   color: black;
-/*
-  font-size: 9px;
-  line-height: 16px;
-  background-color: #99CCFF;
+  /*
+     font-size: 9px;
+     line-height: 16px;
+     background-color: #99CCFF;
+     text-align: center;
+     letter-spacing: 6px;
+     height: 16px;
+     */
+  }
+
+
+/* The Important Sections */
+
+#main
+{
+  /*display:inline-block;*/
+  width: 1000px;
+  margin-left: auto ;
+  margin-right: auto ;
+  border: 1px solid black;
+  border-bottom-width: 1px;
+  height: auto;
+  /*padding-bottom: 30px;*/
+  min-height: 95%;
+  /*float: middle;*/
+  }
+
+#fit
+{ 
+  margin-left: auto ;
+  margin-right: auto ;
   text-align: center;
-  letter-spacing: 6px;
-  height: 16px;
-*/
+  }
+
+.channel 
+{
+  /*display:inline-block;*/
+  width: 250px;
+  float: left;
+  border: 1px solid black;
+  }
+
+.sample
+{ 
+  width: 250px;
+  }
+
+.sample_name
+{  
+  width: 80px;
+  }
+.sample_value
+{  
+  width: 40px;
   }
 
 #menu a:link{ color:#000; }
@@ -122,37 +168,6 @@ a:active { color: #900; text-decoration: underline; background-color: transparen
 .tab{ text-indent: 3em; }
 
 
-
-/* The Important Sections */
-
-#main
-{
-  /*display:inline-block;*/
-  width: 1000px;
-  margin-left: auto ;
-  margin-right: auto ;
-  border: 1px solid black;
-  border-bottom-width: 1px;
-  height: auto;
-  /*padding-bottom: 30px;*/
-  min-height: 95%;
-  /*float: middle;*/
-  }
-
-#fit
-{ 
-  margin-left: auto ;
-  margin-right: auto ;
-  text-align: center;
- }
-
-.channel 
-{
-  /*display:inline-block;*/
-  width: 200px;
-  float: left;
-  border: 1px solid black;
-  }
 
 .bar 
 {  width: 100%;
@@ -270,7 +285,7 @@ form fieldset
   margin: 0;
   }
 
- /* bump up legend font size, not too large or it'll overwrite border on left */
+/* bump up legend font size, not too large or it'll overwrite border on left */
 /* be careful with padding, it'll shift the nice offset on top of border  */
 form fieldset legend { font-size:1.1em; }}
 
