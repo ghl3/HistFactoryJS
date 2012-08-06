@@ -90,6 +90,8 @@ function MakePlot() {
 	data.push(sample_dict);
     }
 
+    // Explicitely put data at the end
+
     // Make the labels
     //var axis_labels = Array()
     //for( var sample_idx in AllSamples ){
