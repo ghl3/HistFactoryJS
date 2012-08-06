@@ -1,7 +1,92 @@
 
 $(document).ready(function() {
     console.log("Document Ready");
+    
+    var channel_list_from_storage = localStorage.getItem("channel_list");//$.Storage.get("channel_list");
+    console.log(channel_list_from_storage);
+    $('#Channel_List').html(channel_list_from_storage);
+
 });
+
+
+// Define the 'sample' class
+function Sample(name) {
+    this.name = name;
+    this.value = 0;
+}
+
+// Define the 'channel' class
+function Channel(name) {
+    this.name = name;
+    this.data = 0;
+    this.samples = new Array();
+}
+Channel.prototype.AddSample = function(sample){
+    this.samples.push(sample);
+}
+
+function CreateSampleListFromDOM(sample_list_dom) {
+
+    sample_element_list = sample_list_dom.getElementsByClassName('sample');
+
+    sample_list = new Array();
+
+    for( var sample_idx = 0; sample_idx < sample_element_list.length; sample_idx++) {
+	var sample_element = sample_element_list[sample_idx];
+
+	var name  = sample_element.getElementsByClassName('sample_name')[0].value;
+	var value = sample_element.getElementsByClassName('sample_value')[0].value;
+
+	console.log("Creating Sample: Name=" + name + " value=" + value );
+
+	var sample = new Sample(name);
+	sample.value = value;
+	sample_list.push(sample);
+    }
+
+    return sample_list;
+}
+
+function CreateChannelFromDOM(chan_obj) {
+
+    console.debug(chan_obj);
+    
+    var name = chan_obj.getElementsByClassName('channel_name')[0].value; // chan.find('.channel_name')[0].value; /
+    var data = chan_obj.getElementsByClassName('channel_data')[0].value;
+
+    console.log("Creating Channel: Name=" + name + " data=" + data );
+
+    var chan = new Channel(name);
+    chan.data = data;
+
+    // Get the list of samples 
+    // and convert to a list of 
+    // sample classes
+    var sample_list = CreateSampleListFromDOM( chan_obj.getElementsByClassName('sample_list')[0] );
+    chan.samples = sample_list;
+
+    return chan;
+
+}
+
+
+function GetMeasurementObject() {
+
+    var measurement = new Array();
+
+    // Get the list of channels
+    var channel_list = $('.channel');
+    for(var channel_idx = 0; channel_idx < channel_list.length; ++channel_idx){
+	channel = channel_list[channel_idx];
+	measurement.push(CreateChannelFromDOM(channel));
+    }
+    
+    console.log("Final Measurement:");
+    console.log(measurement);
+
+    return measurement;
+
+} 
 
 
 function AddNewChannel() {
@@ -106,7 +191,8 @@ function GetHistogramData() {
     // Loop over the histogram DOM tree
     // and get the value of data and backgrounds
     // from each channel.
-    // Return as a list
+    // Return as a dictionary:
+    // HistData["channelA"] = {"data" : data, "SampleA" : sampleA, ... }
 
     console.log("Getting Histogram Data");
 
@@ -152,4 +238,8 @@ function GetHistogramData() {
 // Attach this function to the proper button
 $(document).ready(function() {
     $('#fit_button').live('click', GetHistogramData)
+});
+
+$(document).ready(function() {
+    $('#update_button').live('click', MakePlot)
 });

@@ -4,13 +4,106 @@ $(document).ready( function(){
 });
 
 
+function MakeHistogramFromData(data, css_id, labels) {
+
+    console.log("Making Histogram From Data in id: " + css_id);
+
+    var options = {
+	series: {stack: 0,
+		 lines: {show: false, steps: false },
+		 bars: {show: true, barWidth: 0.9, align: 'center',},
+		},
+	//xaxis: {ticks: [[1,'One'], [2,'Two'], [3,'Three'], [4,'Four'], [5,'Five']]},
+	xaxis: {ticks: labels},
+    };
+    
+    $.plot($(css_id), data, options);
+    
+    console.log("Successfully made plot in id: " + css_id);
+
+}
+
+
 function MakePlot() {
 
     // To make the plot, we need the following:
-    // List[ dict{ label: sample_name, data : data_list }, ...]
+    // HistData["channelA"] = {"data" : data, "SampleA" : sampleA, ... }
 
     var measurement = GetHistogramData();
-    
+
+    // First, get ALL the samples
+    // across all channels
+    var AllSamples = []
+    var axis_labels = Array();
+    var channel_idx = -1;
+    for(var channel_name in measurement) {
+	channel_idx += 1;
+	var channel = measurement[channel_name];
+	axis_labels.push([channel_idx, channel_name]);
+	// Get the samples for this channel
+	var keys = [];
+	for(var k in channel){
+	    if(AllSamples.indexOf(k) === -1) AllSamples.push(k)
+	}
+    }
+    console.log("Found Samples: ");
+    console.log(AllSamples);
+
+    // Now, for each sample, make the dictionary of values
+    // Sample[1] = ValInChannel1; 
+    // Sample[2] = ValInChannel2;
+    // etc
+    // Loop over Samples
+    var data = new Array()
+
+    for( var sample_idx in AllSamples ){
+	var sample_name = AllSamples[sample_idx];
+	console.log("Getting data for sample: " + sample_name);
+	// Get the 'data' for this sample, meaning
+	// this histogram heights across channels
+	var channel_idx = -1;
+	var sample_data = new Array();
+	for(var channel_name in measurement) {
+	    var channel = measurement[channel_name];
+	    channel_idx += 1; 
+	    if(sample_name in channel) {
+		var channel_sample_val = channel[sample_name];
+		sample_data.push([channel_idx, channel_sample_val]);
+	    }
+	    else {
+		sample_data.push([channel_idx, 0.0]);
+	    }
+	}
+	
+	// Make the 'dictionary' for this sample, which
+	// is passed to the plotmaking function
+	var sample_dict = {label : sample_name, data : sample_data}
+	console.log("Found data for sample: " + sample_name);
+	console.log(sample_dict);
+	data.push(sample_dict);
+    }
+
+    // Make the labels
+    //var axis_labels = Array()
+    //for( var sample_idx in AllSamples ){
+	//var sample_name = AllSamples[sample_idx];
+	//axis_labels.push([sample_idx, sample_name]);
+    //}
+
+    // Finally, turn this data into a histogram plot
+    MakeHistogramFromData( data, "#plot", axis_labels );
+
+    // And save this info into the html5 storage
+    var channel_list = $('#Channel_List').html(); //innerHTML;
+    console.log("Caching Channel_List in local storage:");
+    console.log(channel_list);
+    localStorage.setItem("channel_list", channel_list);
+
+}
+
+
+/*
+    var SampleList = new Array();
     var Data = new Array();
 
     for (var channel_name in measurement) {
@@ -19,14 +112,9 @@ function MakePlot() {
 	    throw "key error";
 	}
 	var channel = measurement[channel_name];
-	
-	
-	
     }
-    
-
 }
-
+*/
 
 
 $(function () {
