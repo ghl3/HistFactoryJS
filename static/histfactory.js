@@ -2,9 +2,16 @@
 $(document).ready(function() {
     console.log("Document Ready");
     
-    var channel_list_from_storage = localStorage.getItem("channel_list");//$.Storage.get("channel_list");
-    console.log(channel_list_from_storage);
-    $('#Channel_List').html(channel_list_from_storage);
+    if(localStorage.getItem("measurement") != null) {
+	console.log(localStorage.getItem("measurement"));
+	var cached_measurement = JSON.parse(localStorage.getItem("measurement")); //$.Storage.get("channel_list");
+	console.log("Using cached measurement:");
+	console.log(cached_measurement);
+	CreateChannelListDOMFromMeasurement(cached_measurement);
+	MakePlot();
+    }
+    
+    //$('#Channel_List').html(channel_list_from_storage);
 
 });
 
@@ -69,7 +76,6 @@ function CreateChannelFromDOM(chan_obj) {
 
 }
 
-
 function GetMeasurementObject() {
 
     var measurement = new Array();
@@ -87,6 +93,103 @@ function GetMeasurementObject() {
     return measurement;
 
 } 
+
+
+function CreateDOMFromSample(sample) {
+
+    // First, create the new sample
+    var sample_element = document.createElement('div');
+    sample_element.setAttribute('class', 'sample');
+    sample_element.innerHTML = "This is a sample <br>";
+    
+    // Add the 'name' input field
+    var sample_name = document.createElement('input');
+    sample_name.setAttribute('type',"text");
+    sample_name.setAttribute('class',"sample_name");
+    sample_name.setAttribute('value', sample.name );
+    sample_element.innerHTML += "Name:";
+    sample_element.appendChild( sample_name );
+    
+    // Add the 'value' input field
+    var sample_value = document.createElement('input');
+    sample_value.setAttribute('type',"text");
+    sample_value.setAttribute('class',"sample_value");
+    sample_value.setAttribute('value', sample.value );
+    sample_element.innerHTML += "Value:";
+    sample_element.appendChild( sample_value );
+    
+    // Finally, add the sample to the list of samples
+    return sample_element;
+}
+
+function CreateDOMFromChannel(channel) {
+
+    console.log("Adding New Channel");
+
+    // First, create our new div (not yet attached)
+    var new_channel = document.createElement('div');
+    new_channel.setAttribute('class', 'channel');
+    new_channel.innerHTML = "This is a channel <br>";
+
+    // Add the 'name' input field
+    var channel_name = document.createElement('input');
+    channel_name.setAttribute('type',"text");
+    channel_name.setAttribute('class',"channel_name");
+    channel_name.setAttribute('value', channel.name);
+    new_channel.innerHTML += "Name:";
+    new_channel.appendChild( channel_name );
+
+    // Add a Line Break
+    new_channel.appendChild( document.createElement('br') );
+
+    // Add the 'data' input field
+    var channel_data = document.createElement('input');
+    channel_data.setAttribute('type',"text");
+    channel_data.setAttribute('class',"channel_data");
+    channel_data.setAttribute('value', channel.data );
+    new_channel.innerHTML += "Data:";
+    new_channel.appendChild( channel_data );
+
+    // Add the list of samples div
+    var sample_list = document.createElement('div');
+    sample_list.setAttribute('class', 'sample_list');
+    for(var sample_itr=0; sample_itr<channel.samples.length; ++sample_itr) {
+	sample_list.appendChild( CreateDOMFromSample(channel.samples[sample_itr]) );
+    }
+    //AppendDOMSamplesToList( sample_list, channel.samples);
+    new_channel.appendChild( sample_list );
+    
+
+    // Add a 'new sample' button to the channel
+    var new_sample_button = document.createElement('input');
+    new_sample_button.setAttribute('type','button');
+    new_sample_button.setAttribute('class','NewSample');
+    new_sample_button.setAttribute('value','Add New Sample');
+    new_channel.appendChild( new_sample_button );
+
+    // Finally, append the channel to the channel_list
+    return new_channel;
+
+}
+
+function CreateChannelListDOMFromMeasurement(measurement) {
+
+    // First, get a handle on the channel_list div
+    var channel_list = document.getElementById('Channel_List');
+
+    for( var channel_itr=0; channel_itr<measurement.length; channel_itr++) {
+	var channel_element = CreateDOMFromChannel( measurement[channel_itr] );
+	channel_list.appendChild(channel_element);
+    }
+
+    console.log("Successfully created channel DOM from measurement");
+
+}
+
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
 
 
 function AddNewChannel() {

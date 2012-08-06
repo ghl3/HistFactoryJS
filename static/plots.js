@@ -94,10 +94,10 @@ function MakePlot() {
     MakeHistogramFromData( data, "#plot", axis_labels );
 
     // And save this info into the html5 storage
-    var channel_list = $('#Channel_List').html(); //innerHTML;
-    console.log("Caching Channel_List in local storage:");
-    console.log(channel_list);
-    localStorage.setItem("channel_list", channel_list);
+    var measurement = GetMeasurementObject(); //channel_list = $('#Channel_List').html(); //innerHTML;
+    console.log("Caching measurement object in local storage:");
+    console.log(measurement);
+    localStorage.setItem("measurement", JSON.stringify(measurement));
 
 }
 
