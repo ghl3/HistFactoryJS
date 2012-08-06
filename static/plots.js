@@ -9,9 +9,9 @@ function MakeHistogramFromData(data, css_id, labels) {
     console.log("Making Histogram From Data in id: " + css_id);
 
     var options = {
-	series: {stack: 0,
+	series: {stack: 1,
 		 lines: {show: false, steps: false },
-		 bars: {show: true, barWidth: 0.9, align: 'center',},
+		 bars: {show: true, barWidth: 1.0, align: 'center',},
 		},
 	//xaxis: {ticks: [[1,'One'], [2,'Two'], [3,'Three'], [4,'Four'], [5,'Five']]},
 	xaxis: {ticks: labels},
@@ -78,6 +78,13 @@ function MakePlot() {
 	// Make the 'dictionary' for this sample, which
 	// is passed to the plotmaking function
 	var sample_dict = {label : sample_name, data : sample_data}
+	if(sample_name=='data') {
+	    sample_dict["stack"] = 0;
+	    sample_dict["color"] = $.color.make(355,355,355,1); //"white";
+	}
+	else {
+	    sample_dict["stack"] = 1;
+	}
 	console.log("Found data for sample: " + sample_name);
 	console.log(sample_dict);
 	data.push(sample_dict);
@@ -120,14 +127,14 @@ function MakePlot() {
 $(function () {
     var css_id = '#plot';
     var data = [
-	{label: 'foo', data: [[1,300], [2,300], [3,300], [4,300], [5,300]]},
-	{label: 'bar', data: [[1,800], [2,600], [3,400], [4,200], [5,0]]},
-	{label: 'baz', data: [[1,100], [2,200], [3,300], [4,400], [5,500]]},
+	{label: 'foo', data: [[1,300], [2,300], [3,300], [4,300], [5,300]], stack: false},
+	{label: 'bar', data: [[1,800], [2,600], [3,400], [4,200], [5,0]],   stack: true},
+	{label: 'baz', data: [[1,100], [2,200], [3,300], [4,400], [5,500]], stack: true},
     ];
     var options = {
-	series: {stack: 0,
+	series: {stack: 1,
 		 lines: {show: false, steps: false },
-		 bars: {show: true, barWidth: 0.9, align: 'center',},
+		 bars: {show: true, barWidth: 1.0, align: 'center',},
 		},
 	xaxis: {ticks: [[1,'One'], [2,'Two'], [3,'Three'], [4,'Four'], [5,'Five']]},
     };
