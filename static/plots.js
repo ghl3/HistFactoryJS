@@ -3,6 +3,21 @@ $(document).ready( function(){
     console.log("Loading plots.js");
 });
 
+// Make the 'enter' key activate an update
+// when used on an input
+
+// Update text inputs using enter
+$(document).ready(function() {
+    console.log("Setting Enter key");
+    $('input[type="text"]').keyup(function(event){
+	console.log("Found Key: " + event.keyCode);
+	var code = (event.keyCode ? event.keyCode : event.which);
+	if(code == 13) { 
+	    console.log("Found Enter");
+	    MakePlot();
+	}
+    });
+});
 
 function MakeHistogramFromData(data, css_id, labels) {
 
@@ -69,12 +84,12 @@ function MakePlot() {
 	    if(sample_name in channel) {
 		var channel_sample_val = channel[sample_name];
 		if(channel_sample_val == 0) {
-		    continue;
+		    // continue;
 		}
 		sample_data.push([channel_idx, channel_sample_val]);
 	    }
 	    else {
-		// sample_data.push([channel_idx, 0.0]);
+		sample_data.push([channel_idx, 0.0]);
 	    }
 	}
 	
@@ -92,6 +107,9 @@ function MakePlot() {
 	console.log(sample_dict);
 	data.push(sample_dict);
     }
+
+    console.log("Drawing the following data: ");
+    console.log(data);
 
     // Explicitely put data at the end
 
