@@ -449,14 +449,29 @@ function MakeHistogramFromData(data, css_id, labels) {
 */
 
 
-function AddErrorsToData(data) {
+function AddErrorsToData(sample_dict) {
+    // See : http://code.google.com/p/flot/issues/attachmentText?id=215&aid=5246971771003358806&name=errorbars-example.html&token=YI9opDwFPKnW3XKeWqBtc3y0t_s%3A1344311014277
+
+    var data = sample_dict['data'];
     for(var chan_itr=0; chan_itr<data.length; ++chan_itr) {
 	var y_val = data[chan_itr][1];
 	var error = Math.sqrt(y_val);
-	data[chan_itr].push(error);
-	data[chan_itr].push(error);
-	data[chan_itr].push(.1);
+	data[chan_itr].push(.5); // x
+	data[chan_itr].push(.5); // x
+	data[chan_itr].push(error); // y
+	data[chan_itr].push(error); // y
     }
+    
+    // Configure the appearence of points and error-bars
+    data_points = {
+	fillColor: "black",
+	errorbars: "xy",
+	radius: 1,
+	xerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true},
+	yerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true}
+    };
+    sample_dict['points'] = data_points;
+
 }
 
 
@@ -522,9 +537,10 @@ function MakePlot() {
 	if(sample_name=='data') {
 	    sample_dict["stack"] = 0;
 	    sample_dict["color"] = $.color.make(355,355,355,1); //"white";
-	    // See : http://code.google.com/p/flot/issues/attachmentText?id=215&aid=5246971771003358806&name=errorbars-example.html&token=YI9opDwFPKnW3XKeWqBtc3y0t_s%3A1344311014277
+
 	    // Add the root(n) error bars to data
-	    AddErrorsToData(sample_dict['data']);
+	    //AddErrorsToData(sample_dict['data']);
+	    AddErrorsToData(sample_dict);
 	    /*
 	    for(var chan_itr=0; chan_itr<sample_dict['data'].length; ++chan_itr) {
 		var y_val = sample_dict['data'][chan_itr][1];
@@ -537,12 +553,17 @@ function MakePlot() {
 	    //sample_dict['data'][0].push(10);
 	    //sample_dict['data'][0].push(10);
 	    //sample_dict['data'][0].push(.1);
+	    
+	    /*
 	    data_points = {
 		fillColor: "black",
-		errorbars: "y",
-		yerr: {show: true, color: "black", upperCap: "-", lowerCap: "-"}
+		errorbars: "xy",
+		radius: 1,
+		xerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true},
+		yerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true}
 	    };
 	    sample_dict['points'] = data_points;
+*/
 	}
 	else {
 	    sample_dict["stack"] = 1;
@@ -570,7 +591,7 @@ function MakePlot() {
     var options = {
 	series: {stack: 1,
 		 lines: {show: false, steps: false },
-		 bars: {show: true, barWidth: 1.0, align: 'center'}, //, lineWidth: 1.0},
+		 bars: {show: true, barWidth: 1.0, align: 'center', lineWidth: 0.0}
 		},
 	//xaxis: {ticks: [[1,'One'], [2,'Two'], [3,'Three'], [4,'Four'], [5,'Five']]},
 	xaxis: {ticks: axis_labels},
