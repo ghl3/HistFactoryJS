@@ -134,9 +134,9 @@ function CreateDOMFromSample(sample) {
 
 function DeleteSample() {
     console.log("Deleting Sample");
+    $(this).parent().remove();   
     return;
 }
-
 $(document).ready(function() {
     $('.DeleteSampleButton').live('click', DeleteSample)
 });
@@ -206,9 +206,9 @@ function CreateDOMFromChannel(channel) {
 
 function DeleteChannel() {
     console.log("Deleting Channel");
+    $(this).parent().remove();
     return;
 }
-
 $(document).ready(function() {
     $('.DeleteChannelButton').live('click', DeleteChannel)
 });
