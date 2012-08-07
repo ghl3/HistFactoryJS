@@ -100,7 +100,7 @@ function CreateDOMFromSample(sample) {
     // First, create the new sample
     var sample_element = document.createElement('div');
     sample_element.setAttribute('class', 'sample');
-    sample_element.innerHTML = "This is a sample <br>";
+    sample_element.innerHTML = "Sample <br>";
     
     // Add the 'name' input field
     var sample_name = document.createElement('input');
@@ -129,7 +129,7 @@ function CreateDOMFromChannel(channel) {
     // First, create our new div (not yet attached)
     var new_channel = document.createElement('div');
     new_channel.setAttribute('class', 'channel');
-    new_channel.innerHTML = "This is a channel <br>";
+    new_channel.innerHTML = "Channel <br>";
 
     // Add the 'name' input field
     var channel_name = document.createElement('input');
@@ -207,7 +207,7 @@ function AddNewChannel() {
     // Then, create our new div (not yet attached)
     var new_channel = document.createElement('div');
     new_channel.setAttribute('class', 'channel');
-    new_channel.innerHTML = "This is a channel <br>";
+    new_channel.innerHTML = "Channel <br>";
 
     // Add the 'name' input field
     var channel_name = document.createElement('input');
@@ -261,7 +261,7 @@ function AddSampleToChannel(channel) {
     // Then, add the new sample
     var new_sample = document.createElement('div');
     new_sample.setAttribute('class', 'sample');
-    new_sample.innerHTML = "This is a sample <br>";
+    new_sample.innerHTML = "Sample <br>";
 
     // Add the 'name' input field
     var sample_name = document.createElement('input');
