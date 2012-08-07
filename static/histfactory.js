@@ -10,8 +10,6 @@ $(document).ready(function() {
 	CreateChannelListDOMFromMeasurement(cached_measurement);
 	MakePlot();
     }
-    
-    //$('#Channel_List').html(channel_list_from_storage);
 
 });
 
@@ -190,7 +188,6 @@ function CreateDOMFromChannel(channel) {
     for(var sample_itr=0; sample_itr<channel.samples.length; ++sample_itr) {
 	sample_list.appendChild( CreateDOMFromSample(channel.samples[sample_itr]) );
     }
-    //AppendDOMSamplesToList( sample_list, channel.samples);
     new_channel.appendChild( sample_list );
     
 
@@ -231,7 +228,6 @@ function CreateChannelListDOMFromMeasurement(measurement) {
     }
 
     console.log("Successfully created channel DOM from measurement");
-
 }
 
 
@@ -262,48 +258,6 @@ function AddNewChannel() {
     console.log("Successfully Added a New Channel");
 
     return;
-
-    /*
-    // Then, create our new div (not yet attached)
-    var new_channel = document.createElement('div');
-    new_channel.setAttribute('class', 'channel');
-    new_channel.innerHTML = "Channel <br>";
-
-    // Add the 'name' input field
-    var channel_name = document.createElement('input');
-    channel_name.setAttribute('type',"text");
-    channel_name.setAttribute('class',"channel_name");
-    new_channel.innerHTML += "Name:";
-    new_channel.appendChild( channel_name );
-
-    // Add a Line Break
-    new_channel.appendChild( document.createElement('br') );
-
-    // Add the 'data' input field
-    var channel_data = document.createElement('input');
-    channel_data.setAttribute('type',"text");
-    channel_data.setAttribute('class',"channel_data");
-    new_channel.innerHTML += "Data:";
-    new_channel.appendChild( channel_data );
-
-    // Add the list of samples div
-    var sample_list = document.createElement('div');
-    sample_list.setAttribute('class', 'sample_list');
-    new_channel.appendChild( sample_list );
-    
-    // Add a 'new sample' button to the channel
-    var new_sample_button = document.createElement('input');
-    new_sample_button.setAttribute('type','button');
-    new_sample_button.setAttribute('class','NewSample');
-    new_sample_button.setAttribute('value','Add New Sample');
-    new_channel.appendChild( new_sample_button );
-
-    // Finally, append the channel to the channel_list
-    channel_list.appendChild(new_channel);
-
-    console.log("Successfully Added a New Channel");
-*/
-
 }
 // Attach this function to the proper button
 $(document).ready(function() {
@@ -330,32 +284,6 @@ function AddSampleToChannel(channel) {
     console.log("Successfully added sample to channel");    
 
     return;
-
-    /*
-    // Then, add the new sample
-    var new_sample = document.createElement('div');
-    new_sample.setAttribute('class', 'sample');
-    new_sample.innerHTML = "Sample <br>";
-
-    // Add the 'name' input field
-    var sample_name = document.createElement('input');
-    sample_name.setAttribute('type',"text");
-    sample_name.setAttribute('class',"sample_name");
-    new_sample.innerHTML += "Name:";
-    new_sample.appendChild( sample_name );
-
-    // Add the 'value' input field
-    var sample_value = document.createElement('input');
-    sample_value.setAttribute('type',"text");
-    sample_value.setAttribute('class',"sample_value");
-    new_sample.innerHTML += "Value:";
-    new_sample.appendChild( sample_value );
-
-    // Finally, add the sample to the list of samples
-    sample_list.append(new_sample);
-    
-    console.log("Successfully added sample to channel");    
-*/
 }
 $(document).ready(function() {
     $('.NewSample').live('click', function(){
@@ -435,19 +363,6 @@ $(document).ready(function() {
     $('[type=text]').live('keyup', UpdateOnEnter);
 });
 
-/*
-function MakeHistogramFromData(data, css_id, labels) {
-
-    console.log("Making Histogram From Data in id: " + css_id);
-
-    
-    $.plot($(css_id), data, options);
-    
-    console.log("Successfully made plot in id: " + css_id);
-
-}
-*/
-
 
 function AddErrorsToData(sample_dict) {
     // See : http://code.google.com/p/flot/issues/attachmentText?id=215&aid=5246971771003358806&name=errorbars-example.html&token=YI9opDwFPKnW3XKeWqBtc3y0t_s%3A1344311014277
@@ -521,10 +436,6 @@ function MakePlot() {
 	    channel_idx += 1; 
 	    if(sample_name in channel) {
 		var channel_sample_val = channel[sample_name];
-		if(channel_sample_val == 0) {
-		    // sample_dict['lineWidth']=0;
-		    // continue;
-		}
 		sample_data.push([channel_idx, channel_sample_val]);
 	    }
 	    else {
@@ -537,38 +448,12 @@ function MakePlot() {
 	if(sample_name=='data') {
 	    sample_dict["stack"] = 0;
 	    sample_dict["color"] = $.color.make(355,355,355,1); //"white";
-
-	    // Add the root(n) error bars to data
-	    //AddErrorsToData(sample_dict['data']);
-	    AddErrorsToData(sample_dict);
-	    /*
-	    for(var chan_itr=0; chan_itr<sample_dict['data'].length; ++chan_itr) {
-		var y_val = sample_dict['data'][chan_itr][1];
-		var error = Math.sqrt(y_val);
-		sample_dict['data'][chan_itr].push(error);
-		sample_dict['data'][chan_itr].push(error);
-		sample_dict['data'][chan_itr].push(.1);
-	    }
-*/
-	    //sample_dict['data'][0].push(10);
-	    //sample_dict['data'][0].push(10);
-	    //sample_dict['data'][0].push(.1);
-	    
-	    /*
-	    data_points = {
-		fillColor: "black",
-		errorbars: "xy",
-		radius: 1,
-		xerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true},
-		yerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true}
-	    };
-	    sample_dict['points'] = data_points;
-*/
+	    AddErrorsToData(sample_dict); // root(n)
 	}
 	else {
 	    sample_dict["stack"] = 1;
 	}
-	console.log("Found data for sample: " + sample_name);
+	console.log("Found Sample for Plot: " + sample_name);
 	console.log(sample_dict);
 	
 	// Finally, add this dictionary to the total list
@@ -578,33 +463,22 @@ function MakePlot() {
     console.log("Drawing the following data: ");
     console.log(all_sample_data);
 
-    // Explicitely put data at the end
-
-    // Make the labels
-    //var axis_labels = Array()
-    //for( var sample_idx in AllSamples ){
-	//var sample_name = AllSamples[sample_idx];
-	//axis_labels.push([sample_idx, sample_name]);
-    //}
-
     // Finally, turn this data into a histogram plot
     var options = {
 	series: {stack: 1,
 		 lines: {show: false, steps: false },
 		 bars: {show: true, barWidth: 1.0, align: 'center', lineWidth: 0.0}
 		},
-	//xaxis: {ticks: [[1,'One'], [2,'Two'], [3,'Three'], [4,'Four'], [5,'Five']]},
 	xaxis: {ticks: axis_labels},
 	zoom: {interactive: true}, pan: {interactive: true}
     };
 
     // Make the plot
     $.plot($("#plot"), all_sample_data, options);
-    //MakeHistogramFromData( data, "#plot", axis_labels );
     console.log("Successfully made plot");
 
     // And save this info into the html5 storage
-    var measurement = GetMeasurementObject(); //channel_list = $('#Channel_List').html(); //innerHTML;
+    var measurement = GetMeasurementObject();
     console.log("Caching measurement object in local storage:");
     console.log(measurement);
     localStorage.setItem("measurement", JSON.stringify(measurement));
