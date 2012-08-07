@@ -29,6 +29,10 @@ Channel.prototype.AddSample = function(sample){
     this.samples.push(sample);
 }
 
+//
+// CREATE JAVASCRIPT OBJECTS FROM DOM TREE ELEMENTS:
+//
+
 function CreateSampleListFromDOM(sample_list_dom) {
     
     sample_element_list = sample_list_dom.getElementsByClassName('sample');
@@ -92,6 +96,11 @@ function GetMeasurementObject() {
     return measurement;
 
 } 
+
+
+//
+// CREATE DOM TREE ELEMENTS FROM JAVASCRIPT OBJECTS:
+//
 
 
 function CreateDOMFromSample(sample) {
@@ -236,10 +245,9 @@ function CreateChannelListDOMFromMeasurement(measurement) {
 }
 
 
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
-
+//
+// APPEND NEW DOM TREE OBJECTS
+//
 
 function AddNewChannel() {
     // This function is activated by the
@@ -297,6 +305,12 @@ $(document).ready(function() {
 });
 
 
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+
 /*
 function GetHistogramData() {
 
@@ -349,18 +363,10 @@ function GetHistogramData() {
 }
 */
 
-// Update text inputs using enter
-function UpdateOnEnter(event) {
-    var code = (event.keyCode ? event.keyCode : event.which);
-    if(code == 13) { 
-	console.log("Found Enter");
-	// Update the Plot
-	MakePlot();
-    }
-}
-$(document).ready(function() {
-    $('[type=text]').live('keyup', UpdateOnEnter);
-});
+
+//
+// METHODS USED TO DRAW AND EDIT THE PLOT
+//
 
 
 function AddErrorsToData(sample_dict) {
@@ -529,6 +535,23 @@ $(document).ready(function() {
 });
 
 
+// Update text inputs using enter
+function UpdateOnEnter(event) {
+    var code = (event.keyCode ? event.keyCode : event.which);
+    if(code == 13) { 
+	console.log("Found Enter");
+	// Update the Plot
+	MakePlot();
+    }
+}
+$(document).ready(function() {
+    $('[type=text]').live('keyup', UpdateOnEnter);
+});
+
+
+//
+// METHODS FOR FITTING VIA THE HISTFACTORY BACK ENDy
+//
 
 function FitMeasurement() {
 

@@ -67,7 +67,7 @@ def FitMeasurementUsingHistFactory(measurement_dict):
     fit_result = copy.deepcopy(measurement_dict)
     
     for channel in fit_result:
-        channel["data"] = random.uniform(.9, 1.1)*float(channel["data"])
+        channel["data"] = float(channel["data"])
         
         for sample in channel["samples"]:
             sample["value"] = random.uniform(.9, 1.1)*float(sample["value"])
