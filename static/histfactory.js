@@ -34,6 +34,8 @@ Channel.prototype.AddSample = function(sample){
 //
 
 function CreateSampleListFromDOM(sample_list_dom) {
+    // Take a "sample_list" DOM element and create
+    // a Javascript Array of sample objects
     
     sample_element_list = sample_list_dom.getElementsByClassName('sample');
 
@@ -56,6 +58,8 @@ function CreateSampleListFromDOM(sample_list_dom) {
 }
 
 function CreateChannelFromDOM(chan_obj) {
+    // Take a Channel DOM element and
+    // create a javascript channel object
 
     console.debug(chan_obj);
     
@@ -154,7 +158,6 @@ $(document).ready(function() {
 });
 
 
-
 function CreateDOMFromChannel(channel) {
     // Create a DOM Channel element
     // from a Javascript Channel object
@@ -214,7 +217,6 @@ function CreateDOMFromChannel(channel) {
 
     // Finally, append the channel to the channel_list
     return new_channel;
-
 }
 
 function DeleteChannel() {
@@ -263,10 +265,10 @@ function AddNewChannel() {
     // First, get a handle on the channel_list div
     var channel_list = document.getElementById('Channel_List');
 
-    var channel_element = CreateDOMFromChanne(new_channel);
+    var channel_element = CreateDOMFromChannel(new_channel);
 
     // Finally, append the channel to the channel_list
-    channel_list.appendChild(new_channel);
+    channel_list.appendChild(channel_element);
 
     console.log("Successfully Added a New Channel");
 
@@ -302,6 +304,226 @@ $(document).ready(function() {
     $('.NewSample').live('click', function(){
 	AddSampleToChannel( $(this).parent() );
     })
+});
+
+
+
+
+//
+// METHODS USED TO DRAW AND EDIT THE PLOT
+//
+
+
+function AddErrorsToData(sample_dict) {
+    // See : http://code.google.com/p/flot/issues/attachmentText?id=215&aid=5246971771003358806&name=errorbars-example.html&token=YI9opDwFPKnW3XKeWqBtc3y0t_s%3A1344311014277
+
+    var data = sample_dict['data'];
+    for(var chan_itr=0; chan_itr<data.length; ++chan_itr) {
+	var y_val = data[chan_itr][1];
+	var error = Math.sqrt(y_val);
+	data[chan_itr].push(.5); // x
+	data[chan_itr].push(.5); // x
+	data[chan_itr].push(error); // y
+	data[chan_itr].push(error); // y
+    }
+    
+    // Configure the appearence of points and error-bars
+    data_points = {
+	fillColor: "black",
+	errorbars: "xy",
+	radius: 1,
+	xerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true},
+	yerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true}
+    };
+    sample_dict['points'] = data_points;
+
+}
+
+function MakePlotFromMeasurement(measurement) {
+    // This method actually draws the plot using
+    // the data in a Javascript measurement object
+
+    console.log("MakePlotFromMeasurement() using measurement:");
+    console.log(measurement);
+
+    // First, get ALL the samples
+    // across all channels and
+    // create the x-axis labels
+    var AllSamples = []
+    var axis_labels = Array();
+    for(var channel_idx=0; channel_idx<measurement.length; ++channel_idx) {
+	var channel = measurement[channel_idx];
+	var channel_name = channel["name"];
+	console.log("Checking Channel:" + channel_name);
+	console.log(channel);
+	axis_labels.push([channel_idx, channel_name]);
+	// Get the samples for this channel
+	var keys = [];
+	for(var sample_idx=0; sample_idx<channel.samples.length; ++sample_idx) {
+	    var sample = channel.samples[sample_idx];
+	    if(AllSamples.indexOf(sample.name) === -1) AllSamples.push(sample.name);
+	}
+    }
+    console.log("Found Samples: ");
+    console.log(AllSamples);
+
+    // Create an object to store all bin heights
+    var all_sample_data = new Array()
+
+    // Add the measured data bin heights
+    // as well as error bars
+    var data_dict = {label: "data"};
+    data_dict["stack"] = 0;
+    data_dict["color"] = $.color.make(355,355,355,1); //"white";
+    var data_values = new Array()
+    for(var channel_idx=0; channel_idx<measurement.length; ++channel_idx) {
+	var channel = measurement[channel_idx];
+	data_values.push([channel_idx,channel.data]);
+    }
+    data_dict["data"] = data_values;
+    AddErrorsToData(data_dict); // root(n)
+    all_sample_data.push(data_dict);
+
+
+    // Then, add the bin heights for 
+    // all additional samples
+    for( var sample_idx=0; sample_idx<AllSamples.length; ++sample_idx){
+	var sample_name = AllSamples[sample_idx];
+	var sample_dict = {label: sample_name};
+
+	// Set the samples to be stacked
+	sample_dict["stack"] = 1;
+
+	// Get the bin heightsfor this sample
+	// across all channels
+	console.log("Getting data for sample: " + sample_name);
+	//var channel_idx = -1;
+	var sample_data = new Array();
+	for(var channel_idx=0; channel_idx<measurement.length; ++channel_idx) {
+	    var channel = measurement[channel_idx];
+
+	    // Check if this channel 
+	    // contains the current sample
+	    var channel_has_sample=false;
+	    var samples_in_chan_itr=0;
+	    for(; samples_in_chan_itr<channel.samples.length; ++samples_in_chan_itr) {
+		if( channel.samples[samples_in_chan_itr].name == sample_name){
+		    channel_has_sample=true;
+		    break;
+		}
+	    }
+	    
+	    if(channel_has_sample) {
+		var sample = channel.samples[samples_in_chan_itr];
+		var channel_sample_val = sample["value"]; //channel[sample_name];
+		console.log("Found data for channel: " + channel["name"] 
+			    + " and sample: " + sample_name + ": " 
+			    + channel_sample_val); 
+		sample_data.push([channel_idx, channel_sample_val]);
+	    }
+	    else {
+		sample_data.push([channel_idx, 0.0]);
+	    }
+	}
+	sample_dict['data'] = sample_data;
+
+	// Finally, add this dictionary to the total list
+	console.log("Found Sample for Plot: " + sample_name);
+	console.log(sample_dict);
+	all_sample_data.push(sample_dict);
+    }
+
+    console.log("Drawing the following data: ");
+    console.log(all_sample_data);
+
+    // Create the overall options for the plot
+    var options = {
+	series: {stack: 1,
+		 lines: {show: false, steps: false },
+		 bars: {show: true, barWidth: 1.0, align: 'center', lineWidth: 0.0}
+		},
+	xaxis: {ticks: axis_labels},
+	zoom: {interactive: true}, pan: {interactive: true}
+    };
+
+    // Make the plot itself
+    $.plot($("#plot"), all_sample_data, options);
+    console.log("Successfully made plot");
+
+    // And save this info into the html5 storage
+    var measurement = GetMeasurementObject();
+    console.log("Caching measurement object in local storage:");
+    console.log(measurement);
+    localStorage.setItem("measurement", JSON.stringify(measurement));
+
+}
+
+function MakePlot() {
+    // Make the plot based on the
+    // current values in the DOM
+    var measurement = GetMeasurementObject();
+    MakePlotFromMeasurement(measurement);
+}
+
+// Attach this function to the proper button
+$(document).ready(function() {
+    $('#update_button').live('click', MakePlot)
+});
+
+
+// Update text inputs using enter
+function UpdateOnEnter(event) {
+    var code = (event.keyCode ? event.keyCode : event.which);
+    if(code == 13) { 
+	console.log("Found Enter");
+	// Update the Plot
+	MakePlot();
+    }
+}
+$(document).ready(function() {
+    $('[type=text]').live('keyup', UpdateOnEnter);
+});
+
+
+//
+// METHODS FOR FITTING VIA THE HISTFACTORY BACK END
+//
+
+function FitMeasurement() {
+
+    // We get current measurement object
+    var measurement = GetMeasurementObject();
+
+    // Then, we package it into a JSON string
+    var meas_JSON_string = JSON.stringify(measurement);
+
+    console.log("Sending measurement as JSON String:");
+    console.log(meas_JSON_string);
+
+    // Create the call-back function
+    // Hey, I just ping'd you, and this is crazy,
+    // but here's my http request, so call-back maybe
+    function successCallback(data) {
+	if( data["flag"]=="error" ) {
+	    console.log("ERROR: Failed to add Activity");
+	}
+	else {
+	    console.log("Successfully fit measurement");
+	    var fit_result = data["result"];
+	    console.log(fit_result);
+	    MakePlotFromMeasurement(fit_result);
+	}
+    }
+
+    // Finally, we send it via AJAX to our
+    // python (Flask) back end for processing
+    console.log("Sending FitMeasurement http request (post via AJAX)");
+    $.post( "/FitMeasurement", {measurement: meas_JSON_string}, successCallback );
+    console.log("Successfully Sent FitMeasurement http request, waiting for callback");
+
+}
+$(document).ready(function() {
+    $('#fit_button').live('click', FitMeasurement)
 });
 
 
@@ -362,233 +584,6 @@ function GetHistogramData() {
 
 }
 */
-
-
-//
-// METHODS USED TO DRAW AND EDIT THE PLOT
-//
-
-
-function AddErrorsToData(sample_dict) {
-    // See : http://code.google.com/p/flot/issues/attachmentText?id=215&aid=5246971771003358806&name=errorbars-example.html&token=YI9opDwFPKnW3XKeWqBtc3y0t_s%3A1344311014277
-
-    var data = sample_dict['data'];
-    for(var chan_itr=0; chan_itr<data.length; ++chan_itr) {
-	var y_val = data[chan_itr][1];
-	var error = Math.sqrt(y_val);
-	data[chan_itr].push(.5); // x
-	data[chan_itr].push(.5); // x
-	data[chan_itr].push(error); // y
-	data[chan_itr].push(error); // y
-    }
-    
-    // Configure the appearence of points and error-bars
-    data_points = {
-	fillColor: "black",
-	errorbars: "xy",
-	radius: 1,
-	xerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true},
-	yerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true}
-    };
-    sample_dict['points'] = data_points;
-
-}
-
-function MakePlotFromMeasurement(measurement) {
-
-    console.log("MakePlotFromMeasurement() using measurement:");
-    console.log(measurement);
-
-    // To make the plot, we need the following:
-    // HistData["channelA"] = {"data" : data, "SampleA" : sampleA, ... }
-
-    //var measurement = GetHistogramData();
-
-    // First, get ALL the samples
-    // across all channels
-    var AllSamples = []
-    var axis_labels = Array();
-    //var channel_idx = -1;
-    //for(var channel_name in measurement) {
-	//channel_idx += 1;
-    for(var channel_idx=0; channel_idx<measurement.length; ++channel_idx) {
-	var channel = measurement[channel_idx];
-	var channel_name = channel["name"];
-	console.log("Checking Channel:" + channel_name);
-	console.log(channel);
-	axis_labels.push([channel_idx, channel_name]);
-	// Get the samples for this channel
-	var keys = [];
-	for(var sample_idx=0; sample_idx<channel.samples.length; ++sample_idx) {
-	    var sample = channel.samples[sample_idx];
-	    if(AllSamples.indexOf(sample.name) === -1) AllSamples.push(sample.name);
-	}
-    }
-    console.log("Found Samples: ");
-    console.log(AllSamples);
-
-    // Now, for each sample, make the dictionary of values
-    // Sample[1] = ValInChannel1; 
-    // Sample[2] = ValInChannel2;
-    // etc
-    // Loop over Samples
-    var all_sample_data = new Array()
-
-    // First, add the measured data
-    var data_dict = {label: "data"};
-    data_dict["stack"] = 0;
-    data_dict["color"] = $.color.make(355,355,355,1); //"white";
-
-    var data_values = new Array()
-    for(var channel_idx=0; channel_idx<measurement.length; ++channel_idx) {
-	var channel = measurement[channel_idx];
-	data_values.push([channel_idx,channel.data]);
-    }
-    data_dict["data"] = data_values;
-    AddErrorsToData(data_dict); // root(n)
-    all_sample_data.push(data_dict);
-
-
-    // Then, add additional samples
-    for( var sample_idx=0; sample_idx<AllSamples.length; ++sample_idx){
-	var sample_name = AllSamples[sample_idx];
-	var sample_dict = {label: sample_name};
-
-	// Get the 'data' for this sample, meaning
-	// this histogram heights across channels
-	console.log("Getting data for sample: " + sample_name);
-	//var channel_idx = -1;
-	var sample_data = new Array();
-	for(var channel_idx=0; channel_idx<measurement.length; ++channel_idx) {
-	    var channel = measurement[channel_idx];
-	    //channel_idx += 1; 
-	    
-	    var channel_has_sample=false;
-	    var samples_in_chan_itr=0;
-	    for(; samples_in_chan_itr<channel.samples.length; ++samples_in_chan_itr) {
-		if( channel.samples[samples_in_chan_itr].name == sample_name){
-		    channel_has_sample=true;
-		    break;
-		}
-	    }
-
-	    if(channel_has_sample) {
-		var sample = channel.samples[samples_in_chan_itr];
-		var channel_sample_val = sample["value"]; //channel[sample_name];
-		console.log("Found data for channel: " + channel["name"] 
-			    + " and sample: " + sample_name + ": " 
-			    + channel_sample_val); 
-		sample_data.push([channel_idx, channel_sample_val]);
-	    }
-	    else {
-		sample_data.push([channel_idx, 0.0]);
-	    }
-	}
-	sample_dict['data'] = sample_data;
-
-	// Add additional options to the dictionary
-	if(false){
-	}
-	else {
-	    sample_dict["stack"] = 1;
-	}
-	console.log("Found Sample for Plot: " + sample_name);
-	console.log(sample_dict);
-	
-	// Finally, add this dictionary to the total list
-	all_sample_data.push(sample_dict);
-    }
-
-    console.log("Drawing the following data: ");
-    console.log(all_sample_data);
-
-    // Finally, turn this data into a histogram plot
-    var options = {
-	series: {stack: 1,
-		 lines: {show: false, steps: false },
-		 bars: {show: true, barWidth: 1.0, align: 'center', lineWidth: 0.0}
-		},
-	xaxis: {ticks: axis_labels},
-	zoom: {interactive: true}, pan: {interactive: true}
-    };
-
-    // Make the plot
-    $.plot($("#plot"), all_sample_data, options);
-    console.log("Successfully made plot");
-
-    // And save this info into the html5 storage
-    var measurement = GetMeasurementObject();
-    console.log("Caching measurement object in local storage:");
-    console.log(measurement);
-    localStorage.setItem("measurement", JSON.stringify(measurement));
-
-}
-
-function MakePlot() {
-    var measurement = GetMeasurementObject();
-    MakePlotFromMeasurement(measurement);
-}
-
-// Attach this function to the proper button
-$(document).ready(function() {
-    $('#update_button').live('click', MakePlot)
-});
-
-
-// Update text inputs using enter
-function UpdateOnEnter(event) {
-    var code = (event.keyCode ? event.keyCode : event.which);
-    if(code == 13) { 
-	console.log("Found Enter");
-	// Update the Plot
-	MakePlot();
-    }
-}
-$(document).ready(function() {
-    $('[type=text]').live('keyup', UpdateOnEnter);
-});
-
-
-//
-// METHODS FOR FITTING VIA THE HISTFACTORY BACK ENDy
-//
-
-function FitMeasurement() {
-
-    // We get current measurement object
-    var measurement = GetMeasurementObject();
-
-    // Then, we package it into a JSON string
-    var meas_JSON_string = JSON.stringify(measurement);
-
-    console.log("Sending measurement as JSON String:");
-    console.log(meas_JSON_string);
-
-    // Create the call-back function
-    // Hey, I just ping'd you, and this is crazy,
-    // but here's my http request, so call-back maybe
-    function successCallback(data) {
-	if( data["flag"]=="error" ) {
-	    console.log("ERROR: Failed to add Activity");
-	}
-	else {
-	    console.log("Successfully fit measurement");
-	    var fit_result = data["result"];
-	    console.log(fit_result);
-	    MakePlotFromMeasurement(fit_result);
-	}
-    }
-
-    // Finally, we send it via AJAX to our
-    // python (Flask) back end for processing
-    console.log("Sending FitMeasurement http request (post via AJAX)");
-    $.post( "/FitMeasurement", {measurement: meas_JSON_string}, successCallback );
-    console.log("Successfully Sent FitMeasurement http request, waiting for callback");
-
-}
-$(document).ready(function() {
-    $('#fit_button').live('click', FitMeasurement)
-});
 
 
 
