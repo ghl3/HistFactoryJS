@@ -135,6 +135,8 @@ function CreateDOMFromSample(sample) {
 function DeleteSample() {
     console.log("Deleting Sample");
     $(this).parent().remove();   
+    // Update the Plot
+    MakePlot();
     return;
 }
 $(document).ready(function() {
@@ -207,10 +209,12 @@ function CreateDOMFromChannel(channel) {
 function DeleteChannel() {
     console.log("Deleting Channel");
     $(this).parent().remove();
+    // Update the Plot
+    MakePlot();
     return;
 }
 $(document).ready(function() {
-    $('.DeleteChannelButton').live('click', DeleteChannel)
+    $('.DeleteChannelButton').live('click', DeleteChannel);
 });
 
 
@@ -419,16 +423,16 @@ $(document).ready(function() {
 
 
 // Update text inputs using enter
+function UpdateOnEnter(event) {
+    var code = (event.keyCode ? event.keyCode : event.which);
+    if(code == 13) { 
+	console.log("Found Enter");
+	// Update the Plot
+	MakePlot();
+    }
+}
 $(document).ready(function() {
-    console.log("Setting Enter key");
-    $('input[type="text"]').keyup(function(event){
-	console.log("Found Key: " + event.keyCode);
-	var code = (event.keyCode ? event.keyCode : event.which);
-	if(code == 13) { 
-	    console.log("Found Enter");
-	    MakePlot();
-	}
-    });
+    $('[type=text]').live('keyup', UpdateOnEnter);
 });
 
 function MakeHistogramFromData(data, css_id, labels) {
