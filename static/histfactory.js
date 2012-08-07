@@ -15,7 +15,6 @@ $(document).ready(function() {
 
 });
 
-
 // Define the 'sample' class
 function Sample(name) {
     this.name = name;
@@ -118,9 +117,31 @@ function CreateDOMFromSample(sample) {
     sample_element.innerHTML += "Value:";
     sample_element.appendChild( sample_value );
     
+    // Add a button to delete this div
+    var deletebutton = document.createElement('img');
+    deletebutton.name      = "DeleteSampleButton";
+    deletebutton.className = "DeleteSampleButton";
+    deletebutton.src =  'static/images/RedX.jpg';
+    deletebutton.style.width  =  '13px';
+    deletebutton.style.marginLeft  = '2px';
+    deletebutton.style.marginRight = '2px';
+    sample_element.appendChild( deletebutton );
+
     // Finally, add the sample to the list of samples
     return sample_element;
 }
+
+
+function DeleteSample() {
+    console.log("Deleting Sample");
+    return;
+}
+
+$(document).ready(function() {
+    $('.DeleteSampleButton').live('click', DeleteSample)
+});
+
+
 
 function CreateDOMFromChannel(channel) {
 
@@ -129,7 +150,18 @@ function CreateDOMFromChannel(channel) {
     // First, create our new div (not yet attached)
     var new_channel = document.createElement('div');
     new_channel.setAttribute('class', 'channel');
-    new_channel.innerHTML = "Channel <br>";
+    new_channel.innerHTML = "Channel ";
+
+    // Add a button to delete this div
+    var deletebutton = document.createElement('img');
+    deletebutton.name      = "DeleteChannelButton";
+    deletebutton.className = "DeleteChannelButton";
+    deletebutton.src =  'static/images/RedX.jpg';
+    deletebutton.style.width  =  '13px';
+    deletebutton.style.marginLeft  = '2px';
+    deletebutton.style.marginRight = '2px';
+    new_channel.appendChild( deletebutton );
+    new_channel.innerHTML += " <br>";
 
     // Add the 'name' input field
     var channel_name = document.createElement('input');
@@ -171,6 +203,18 @@ function CreateDOMFromChannel(channel) {
     return new_channel;
 
 }
+
+function DeleteChannel() {
+    console.log("Deleting Channel");
+    return;
+}
+
+$(document).ready(function() {
+    $('.DeleteChannelButton').live('click', DeleteChannel)
+});
+
+
+
 
 function CreateChannelListDOMFromMeasurement(measurement) {
 
@@ -215,6 +259,7 @@ function AddNewChannel() {
 
     return;
 
+    /*
     // Then, create our new div (not yet attached)
     var new_channel = document.createElement('div');
     new_channel.setAttribute('class', 'channel');
@@ -253,6 +298,7 @@ function AddNewChannel() {
     channel_list.appendChild(new_channel);
 
     console.log("Successfully Added a New Channel");
+*/
 
 }
 // Attach this function to the proper button
@@ -281,6 +327,7 @@ function AddSampleToChannel(channel) {
 
     return;
 
+    /*
     // Then, add the new sample
     var new_sample = document.createElement('div');
     new_sample.setAttribute('class', 'sample');
@@ -304,7 +351,7 @@ function AddSampleToChannel(channel) {
     sample_list.append(new_sample);
     
     console.log("Successfully added sample to channel");    
-
+*/
 }
 $(document).ready(function() {
     $('.NewSample').live('click', function(){
