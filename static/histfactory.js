@@ -201,8 +201,19 @@ function AddNewChannel() {
 
     console.log("Adding New Channel");
 
+    var new_channel = new Channel("");
+
     // First, get a handle on the channel_list div
     var channel_list = document.getElementById('Channel_List');
+
+    var channel_element = CreateDOMFromChanne(new_channel);
+
+    // Finally, append the channel to the channel_list
+    channel_list.appendChild(new_channel);
+
+    console.log("Successfully Added a New Channel");
+
+    return;
 
     // Then, create our new div (not yet attached)
     var new_channel = document.createElement('div');
@@ -255,9 +266,21 @@ function AddSampleToChannel(channel) {
 
     console.log("Adding Sample To Channel");    
 
+    var new_sample = new Sample("");
+
     // First, get the list of samples for this channel
     var sample_list = channel.find(".sample_list");
     
+    var sample_element = CreateDOMFromSample(new_sample);
+
+    // Finally, add the sample to the list of samples
+    //sample_list.append(new_sample);
+    sample_list.append(sample_element);
+    
+    console.log("Successfully added sample to channel");    
+
+    return;
+
     // Then, add the new sample
     var new_sample = document.createElement('div');
     new_sample.setAttribute('class', 'sample');

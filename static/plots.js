@@ -68,6 +68,9 @@ function MakePlot() {
 	    channel_idx += 1; 
 	    if(sample_name in channel) {
 		var channel_sample_val = channel[sample_name];
+		if(channel_sample_val == 0) {
+		    continue;
+		}
 		sample_data.push([channel_idx, channel_sample_val]);
 	    }
 	    else {
