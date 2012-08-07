@@ -435,24 +435,19 @@ $(document).ready(function() {
     $('[type=text]').live('keyup', UpdateOnEnter);
 });
 
+/*
 function MakeHistogramFromData(data, css_id, labels) {
 
     console.log("Making Histogram From Data in id: " + css_id);
 
-    var options = {
-	series: {stack: 1,
-		 lines: {show: false, steps: false },
-		 bars: {show: true, barWidth: 1.0, align: 'center',},
-		},
-	//xaxis: {ticks: [[1,'One'], [2,'Two'], [3,'Three'], [4,'Four'], [5,'Five']]},
-	xaxis: {ticks: labels},
-    };
     
     $.plot($(css_id), data, options);
     
     console.log("Successfully made plot in id: " + css_id);
 
 }
+*/
+
 
 function AddErrorsToData(data) {
     for(var chan_itr=0; chan_itr<data.length; ++chan_itr) {
@@ -495,13 +490,15 @@ function MakePlot() {
     // Sample[2] = ValInChannel2;
     // etc
     // Loop over Samples
-    var data = new Array()
+    var all_sample_data = new Array()
 
     for( var sample_idx in AllSamples ){
 	var sample_name = AllSamples[sample_idx];
-	console.log("Getting data for sample: " + sample_name);
+	var sample_dict = {label: sample_name};
+
 	// Get the 'data' for this sample, meaning
 	// this histogram heights across channels
+	console.log("Getting data for sample: " + sample_name);
 	var channel_idx = -1;
 	var sample_data = new Array();
 	for(var channel_name in measurement) {
@@ -510,6 +507,7 @@ function MakePlot() {
 	    if(sample_name in channel) {
 		var channel_sample_val = channel[sample_name];
 		if(channel_sample_val == 0) {
+		    // sample_dict['lineWidth']=0;
 		    // continue;
 		}
 		sample_data.push([channel_idx, channel_sample_val]);
@@ -518,10 +516,9 @@ function MakePlot() {
 		sample_data.push([channel_idx, 0.0]);
 	    }
 	}
-	
-	// Make the 'dictionary' for this sample, which
-	// is passed to the plotmaking function
-	var sample_dict = {label : sample_name, data : sample_data}
+	sample_dict['data'] = sample_data;
+
+	// Add additional options to the dictionary
 	if(sample_name=='data') {
 	    sample_dict["stack"] = 0;
 	    sample_dict["color"] = $.color.make(355,355,355,1); //"white";
@@ -552,11 +549,13 @@ function MakePlot() {
 	}
 	console.log("Found data for sample: " + sample_name);
 	console.log(sample_dict);
-	data.push(sample_dict);
+	
+	// Finally, add this dictionary to the total list
+	all_sample_data.push(sample_dict);
     }
 
     console.log("Drawing the following data: ");
-    console.log(data);
+    console.log(all_sample_data);
 
     // Explicitely put data at the end
 
@@ -568,7 +567,20 @@ function MakePlot() {
     //}
 
     // Finally, turn this data into a histogram plot
-    MakeHistogramFromData( data, "#plot", axis_labels );
+    var options = {
+	series: {stack: 1,
+		 lines: {show: false, steps: false },
+		 bars: {show: true, barWidth: 1.0, align: 'center'}, //, lineWidth: 1.0},
+		},
+	//xaxis: {ticks: [[1,'One'], [2,'Two'], [3,'Three'], [4,'Four'], [5,'Five']]},
+	xaxis: {ticks: axis_labels},
+	zoom: {interactive: true}, pan: {interactive: true}
+    };
+
+    // Make the plot
+    $.plot($("#plot"), all_sample_data, options);
+    //MakeHistogramFromData( data, "#plot", axis_labels );
+    console.log("Successfully made plot");
 
     // And save this info into the html5 storage
     var measurement = GetMeasurementObject(); //channel_list = $('#Channel_List').html(); //innerHTML;
