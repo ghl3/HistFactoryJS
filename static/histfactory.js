@@ -8,7 +8,7 @@ $(document).ready(function() {
 	console.log("Using cached measurement:");
 	console.log(cached_measurement);
 	CreateChannelListDOMFromMeasurement(cached_measurement);
-	MakePlot();
+	MakePlotFromMeasurement(cached_measurement);
     }
 
 });
@@ -30,7 +30,7 @@ Channel.prototype.AddSample = function(sample){
 }
 
 function CreateSampleListFromDOM(sample_list_dom) {
-
+    
     sample_element_list = sample_list_dom.getElementsByClassName('sample');
 
     sample_list = new Array();
@@ -74,6 +74,8 @@ function CreateChannelFromDOM(chan_obj) {
 }
 
 function GetMeasurementObject() {
+    // Get the current measurement
+    // as described by the DOM tree
 
     var measurement = new Array();
 
@@ -93,6 +95,8 @@ function GetMeasurementObject() {
 
 
 function CreateDOMFromSample(sample) {
+    // Create a DOM Sample element
+    // from a Javascript Sample object
 
     // First, create the new sample
     var sample_element = document.createElement('div');
@@ -129,7 +133,6 @@ function CreateDOMFromSample(sample) {
     return sample_element;
 }
 
-
 function DeleteSample() {
     console.log("Deleting Sample");
     $(this).parent().remove();   
@@ -144,6 +147,8 @@ $(document).ready(function() {
 
 
 function CreateDOMFromChannel(channel) {
+    // Create a DOM Channel element
+    // from a Javascript Channel object
 
     console.log("Adding New Channel");
 
@@ -215,9 +220,9 @@ $(document).ready(function() {
 });
 
 
-
-
 function CreateChannelListDOMFromMeasurement(measurement) {
+    // Create the full ChannelList (measurement) DOM Element
+    // from a Javascript measurement object
 
     // First, get a handle on the channel_list div
     var channel_list = document.getElementById('Channel_List');
@@ -291,6 +296,8 @@ $(document).ready(function() {
     })
 });
 
+
+/*
 function GetHistogramData() {
 
     // Loop over the histogram DOM tree
@@ -340,15 +347,7 @@ function GetHistogramData() {
     return HistData;
 
 }
-// Attach this function to the proper button
-$(document).ready(function() {
-    $('#fit_button').live('click', GetHistogramData)
-});
-
-$(document).ready(function() {
-    $('#update_button').live('click', MakePlot)
-});
-
+*/
 
 // Update text inputs using enter
 function UpdateOnEnter(event) {
@@ -389,27 +388,34 @@ function AddErrorsToData(sample_dict) {
 
 }
 
+function MakePlotFromMeasurement(measurement) {
 
-function MakePlot() {
+    console.log("MakePlotFromMeasurement() using measurement:");
+    console.log(measurement);
 
     // To make the plot, we need the following:
     // HistData["channelA"] = {"data" : data, "SampleA" : sampleA, ... }
 
-    var measurement = GetHistogramData();
+    //var measurement = GetHistogramData();
 
     // First, get ALL the samples
     // across all channels
     var AllSamples = []
     var axis_labels = Array();
-    var channel_idx = -1;
-    for(var channel_name in measurement) {
-	channel_idx += 1;
-	var channel = measurement[channel_name];
+    //var channel_idx = -1;
+    //for(var channel_name in measurement) {
+	//channel_idx += 1;
+    for(var channel_idx=0; channel_idx<measurement.length; ++channel_idx) {
+	var channel = measurement[channel_idx];
+	var channel_name = channel["name"];
+	console.log("Checking Channel:" + channel_name);
+	console.log(channel);
 	axis_labels.push([channel_idx, channel_name]);
 	// Get the samples for this channel
 	var keys = [];
-	for(var k in channel){
-	    if(AllSamples.indexOf(k) === -1) AllSamples.push(k)
+	for(var sample_idx=0; sample_idx<channel.samples.length; ++sample_idx) {
+	    var sample = channel.samples[sample_idx];
+	    if(AllSamples.indexOf(sample.name) === -1) AllSamples.push(sample.name);
 	}
     }
     console.log("Found Samples: ");
@@ -422,20 +428,50 @@ function MakePlot() {
     // Loop over Samples
     var all_sample_data = new Array()
 
-    for( var sample_idx in AllSamples ){
+    // First, add the measured data
+    var data_dict = {label: "data"};
+    data_dict["stack"] = 0;
+    data_dict["color"] = $.color.make(355,355,355,1); //"white";
+
+    var data_values = new Array()
+    for(var channel_idx=0; channel_idx<measurement.length; ++channel_idx) {
+	var channel = measurement[channel_idx];
+	data_values.push([channel_idx,channel.data]);
+    }
+    data_dict["data"] = data_values;
+    AddErrorsToData(data_dict); // root(n)
+    all_sample_data.push(data_dict);
+
+
+    // Then, add additional samples
+    for( var sample_idx=0; sample_idx<AllSamples.length; ++sample_idx){
 	var sample_name = AllSamples[sample_idx];
 	var sample_dict = {label: sample_name};
 
 	// Get the 'data' for this sample, meaning
 	// this histogram heights across channels
 	console.log("Getting data for sample: " + sample_name);
-	var channel_idx = -1;
+	//var channel_idx = -1;
 	var sample_data = new Array();
-	for(var channel_name in measurement) {
-	    var channel = measurement[channel_name];
-	    channel_idx += 1; 
-	    if(sample_name in channel) {
-		var channel_sample_val = channel[sample_name];
+	for(var channel_idx=0; channel_idx<measurement.length; ++channel_idx) {
+	    var channel = measurement[channel_idx];
+	    //channel_idx += 1; 
+	    
+	    var channel_has_sample=false;
+	    var samples_in_chan_itr=0;
+	    for(; samples_in_chan_itr<channel.samples.length; ++samples_in_chan_itr) {
+		if( channel.samples[samples_in_chan_itr].name == sample_name){
+		    channel_has_sample=true;
+		    break;
+		}
+	    }
+
+	    if(channel_has_sample) {
+		var sample = channel.samples[samples_in_chan_itr];
+		var channel_sample_val = sample["value"]; //channel[sample_name];
+		console.log("Found data for channel: " + channel["name"] 
+			    + " and sample: " + sample_name + ": " 
+			    + channel_sample_val); 
 		sample_data.push([channel_idx, channel_sample_val]);
 	    }
 	    else {
@@ -445,10 +481,7 @@ function MakePlot() {
 	sample_dict['data'] = sample_data;
 
 	// Add additional options to the dictionary
-	if(sample_name=='data') {
-	    sample_dict["stack"] = 0;
-	    sample_dict["color"] = $.color.make(355,355,355,1); //"white";
-	    AddErrorsToData(sample_dict); // root(n)
+	if(false){
 	}
 	else {
 	    sample_dict["stack"] = 1;
@@ -484,6 +517,56 @@ function MakePlot() {
     localStorage.setItem("measurement", JSON.stringify(measurement));
 
 }
+
+function MakePlot() {
+    var measurement = GetMeasurementObject();
+    MakePlotFromMeasurement(measurement);
+}
+
+// Attach this function to the proper button
+$(document).ready(function() {
+    $('#update_button').live('click', MakePlot)
+});
+
+
+
+function FitMeasurement() {
+
+    // We get current measurement object
+    var measurement = GetMeasurementObject();
+
+    // Then, we package it into a JSON string
+    var meas_JSON_string = JSON.stringify(measurement);
+
+    console.log("Sending measurement as JSON String:");
+    console.log(meas_JSON_string);
+
+    // Create the call-back function
+    // Hey, I just ping'd you, and this is crazy,
+    // but here's my http request, so call-back maybe
+    function successCallback(data) {
+	if( data["flag"]=="error" ) {
+	    console.log("ERROR: Failed to add Activity");
+	}
+	else {
+	    console.log("Successfully fit measurement");
+	    var fit_result = data["result"];
+	    console.log(fit_result);
+	    MakePlotFromMeasurement(fit_result);
+	}
+    }
+
+    // Finally, we send it via AJAX to our
+    // python (Flask) back end for processing
+    console.log("Sending FitMeasurement http request (post via AJAX)");
+    $.post( "/FitMeasurement", {measurement: meas_JSON_string}, successCallback );
+    console.log("Successfully Sent FitMeasurement http request, waiting for callback");
+
+}
+$(document).ready(function() {
+    $('#fit_button').live('click', FitMeasurement)
+});
+
 
 
 /* Example Plot
