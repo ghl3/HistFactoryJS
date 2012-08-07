@@ -71,7 +71,7 @@ function MakePlot() {
 		sample_data.push([channel_idx, channel_sample_val]);
 	    }
 	    else {
-		sample_data.push([channel_idx, 0.0]);
+		// sample_data.push([channel_idx, 0.0]);
 	    }
 	}
 	

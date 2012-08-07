@@ -19,7 +19,7 @@ $(document).ready(function() {
 // Define the 'sample' class
 function Sample(name) {
     this.name = name;
-    this.value = 0;
+    this.value = 0.0;
 }
 
 // Define the 'channel' class
