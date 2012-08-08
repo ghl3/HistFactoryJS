@@ -44,6 +44,32 @@ Channel.prototype.AddSample = function(sample){
 // CREATE JAVASCRIPT OBJECTS FROM DOM TREE ELEMENTS:
 //
 
+function CreateSystematicListFromDOM(systematic_list_dom) {
+    // Take a "sample_list" DOM element and create
+    // a Javascript Array of sample objects
+    
+    systematic_element_list = systematic_list_dom.getElementsByClassName('systematic');
+
+    systematic_list = new Array();
+
+    for( var systematic_idx = 0; systematic_idx < systematic_element_list.length; systematic_idx++) {
+	var systematic_element = systematic_element_list[systematic_idx];
+
+	var name  = systematic_element.getElementsByClassName('systematic_name')[0].value;
+	var FracUp   = systematic_element.getElementsByClassName('systematic_FracUp')[0].value;
+	var FracDown = systematic_element.getElementsByClassName('systematic_FracDown')[0].value;
+
+	console.log("Creating Systematic: Name=" + name + " FracUp=" + FracUp + " FracDown=" + FracDown );
+
+	var systematic = new Systematic(name, FracUp, FracDown);
+	systematic_list.push(systematic);
+    }
+
+    return systematic_list;
+}
+
+
+
 function CreateSampleListFromDOM(sample_list_dom) {
     // Take a "sample_list" DOM element and create
     // a Javascript Array of sample objects
@@ -62,6 +88,12 @@ function CreateSampleListFromDOM(sample_list_dom) {
 
 	var sample = new Sample(name);
 	sample.value = value;
+
+	// Get the systematics and add them
+	// to this sample
+	var systematic_list = CreateSystematicListFromDOM( sample_element.getElementsByClassName('systematic_list')[0] );
+	sample.systematics = systematic_list;
+
 	sample_list.push(sample);
     }
 
@@ -417,6 +449,7 @@ function AddSystematicToSample(sample) {
 $(document).ready(function() {
     $('.NewSystematic').live('click', function(){
 	AddSystematicToSample( $(this).parent() );
+	MakePlot();
     })
 });
 
