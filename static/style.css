@@ -38,21 +38,15 @@ footer
   margin-bottom: 10px;
   }
 
-#menu 
-{
-  color: black;
-  /*
-     font-size: 9px;
-     line-height: 16px;
-     background-color: #99CCFF;
-     text-align: center;
-     letter-spacing: 6px;
-     height: 16px;
-     */
-  }
+.centered
+{ 
+  margin-left: auto ;
+  margin-right: auto ;
+  text-align: center;
+}
 
 
-/* The Important Sections */
+/* Individual Objects */
 
 #main
 {
@@ -71,6 +65,7 @@ footer
 
 #menu
 {
+  color: black;
   display: inline-block;
   width: 250px;
   float: top;
@@ -88,8 +83,22 @@ footer
 
 }
 
+#plot 
+{ 
+  width: 600px;
+  text-align: center;
+  margin-left: auto ;
+  margin-right: auto ;
+  }
+
+
+/* The Classes */
+
 .sample 
 {  
+  width: 260px;
+  float: left;
+
   background-color: #D6F8DE;
   /*background-color: #F2FFE1;*/
   /*background-color: #F1FFE1;*/
@@ -100,17 +109,34 @@ footer
 
 .sample_name, .sample_value 
 {  
+  width: 80px;
   margin-right: 5px;
-
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-.centered
-{ 
-  margin-left: auto ;
-  margin-right: auto ;
-  text-align: center;
+.sample_value
+{  
+  width: 40px;
+  }
+
+.systematic{  
+
+  background-color: #E6A9EC;
+}
+.systematic_name
+{  
+  width: 40px;
+  margin-right: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.systematic_FracUp, .systematic_FracDown
+{  
+  width: 30px;
+  margin-right: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .measurementButton
@@ -120,10 +146,15 @@ footer
   text-align: center;
   }
 
+.AddSystematicButton
+{  
+  float: left;
+}
+
 .channel 
 {
   display: inline-block;
-  width: 250px;
+  width: 260px;
   float: top;
   vertical-align:text-top;
   /*float: left;*/
@@ -131,71 +162,6 @@ footer
   background-color: #FFFEEB;
   }
 
-.sample
-{ 
-  width: 250px;
-  }
-
-.sample_name
-{  
-  width: 80px;
-  }
-.sample_value
-{  
-  width: 40px;
-  }
-
-#menu a:link{ color:#000; }
-
-#menu a:visited{ color:#000; }
-
-#plot { 
-
-        width: 600px;
-        text-align: center;
-        margin-left: auto ;
-        margin-right: auto ;
-
-        }
-
-
-.bars rect {
-             fill: steelblue;
-             }
-
-.axis text {
-             font: 10px sans-serif;
-             }
-
-.axis path, .axis line {
-                         fill: none;
-                         stroke: #000;
-                         shape-rendering: crispEdges;
-                         }
-
-
-#rightColumn 
-{
-  width: 200px;
-  margin-top: 10px ;
-  margin-bottom: 10px ;
-  margin-left: auto ;
-  margin-right: auto ;
-  }
-
-
-/* Some Button Stuff */
-.nicebutton 
-{
-  /*background:url(img/button.gif);*/
-  /*display:block;*/
-  color:#555555;
-  font-weight:bold;
-  line-height:25px;
-  text-decoration:none;
-  }
-
-.nicebutton:hover{ color:#0066CC; }
 
 
 /* Misc html stuff */)
@@ -218,211 +184,31 @@ a:active { color: #900; text-decoration: underline; background-color: transparen
 
 
 
-.bar 
-{  width: 100%;
-  content: ".";
-  display: block;
-  height:  0;
-  clear: both;
-  visibility:  hidden;
-  }
-
-.midcol 
+/* Some Button Stuff */
+.nicebutton 
 {
-  width: 60%;
-  margin-left: 1%;
-  margin-right: 5%;
-  float: left;
+  color:#555555;
+  font-weight:bold;
+  line-height:25px;
+  text-decoration:none;
   }
 
-.leftcol 
-{
-  /*  font-size: 10px;
-     font-style: italic; 
-     line-height: 20px;
-     */
-  
-  /*border: 1px solid black;*/
-  position: relative;
-  left: -100px;
-  width: 10px;
-  margin-right: 1px ;
-  text-align: right;
-  float: left;
-  
-  }
-
-.rightcol 
-{
-  font-size: 10px;
-  font-style: italic;
-  line-height: 20px;
-  width: 30%;
-  margin-right: 2.5%;
-  margin-top: 10px;
-  float: left;
-  }
+.nicebutton:hover{ color:#0066CC; }
 
 
 
+/* Some Histogram Stuff
+.bars rect {
+             fill: steelblue;
+             }
 
-img.center 
-{ 
-  display: block;
-  margin-left: auto;   margin-right: auto; 
-  margin-top: auto;   margin-bottom: auto; 
-  } 
+.axis text {
+             font: 10px sans-serif;
+             }
 
-img.centercolumn 
-{ 
-  display: block;
-  margin-left: auto;   margin-right: auto; 
-  margin-top: auto;   margin-bottom: auto; 
-  width:100%;
-  }
-
-.caption 
-{
-  margin-top: 5px;
-  text-indent: 3em;
-  width: 80%; 
-  margin-left: 10%;
-  margin-right: 10%;
-  font-size: 10px;
-  font-style: italic;
-  line-height: 20px;
-  }
-
-/* Forms */
-/* from: http://www.websiteoptimization.com/speed/tweak/forms/ */y
-
-form 
-{   /* set width in form, not fieldset (still takes up more room w/ fieldset width */
-  font:100% verdana,arial,sans-serif;
-  margin: 0;
-  padding: 0;
-  min-width: 500px;
-  max-width: 600px;
-  width: 560px;
-  }
-
-form label 
-{
-  display: block;  /* block float the labels to left column, set a width */
-  float: left;
-  width: 150px;
-  padding: 0;
-  margin: 5px 0 0; /* set top margin same as form input - textarea etc. elements */
-  text-align: right;
-  }
-
-form input, form textarea 
-{
-  display: inline; /* inline display must NOT be set or will hide submit buttons in IE 5x mac */
-  width:auto;      /* set width of form elements to auto-size, otherwise watch for wrap on resize */
-  margin:5px 0 0 10px; /* set margin on left of form elements rather than right of
-                          label aligns textarea better in IE */
-  }
-
-form fieldset 
-{
-  /* clear: both; note that this clear causes inputs to break to left in ie5.x mac, commented out */
-  border-color: #000;
-  border-width: 1px;
-  border-style: solid;
-  padding: 10px;        /* padding in fieldset support spotty in IE */
-  margin: 0;
-  }
-
-/* bump up legend font size, not too large or it'll overwrite border on left */
-/* be careful with padding, it'll shift the nice offset on top of border  */
-form fieldset legend { font-size:1.1em; }}
-
-/* use first-letter pseudo-class to underline accesskey, note that */
-/* Firefox 1.07 WIN and Explorer 5.2 Mac don't support first-letter */
-/* pseudo-class on legend elements, but do support it on label elements */
-/* we instead underline first letter on each label element and accesskey */
-/* each input. doing only legends would lessen cognitive load */
-form fieldset label:first-letter { text-decoration:underline; }
-
-form br { clear:left; }
-
-form small 
-{
-  display: block;
-  margin: 0 0 5px 160px; /* instructions/comments left margin set to align w/ right column inputs */
-  padding: 1px 3px;
-  font-size: 88%;
-  }
-
-form.fc 
-{  /* set width in form, not fieldset (still takes up more room w/ fieldset width */
-  font:100% verdana,arial,sans-serif;
-  margin: 0;
-  padding: 0;
-  min-width: 500px;
-  max-width: 600px;
-  width: 560px; 
-  }
-
-form.fc fieldset 
-{
-  /* clear: both; note that this clear causes inputs to break to left in ie5.x mac, commented out */
-  border-color: #000;
-  border-width: 1px;
-  border-style: solid;
-  padding: 10px;        /* padding in fieldset support spotty in IE */
-  margin: 0;
-  }
-
-/* bump up legend font size, not too large or it'll overwrite border on left */
-/* be careful with padding, it'll shift the nice offset on top of border  */
-form.fc fieldset legend { font-size:1.1em; }
-
-
-form.fc label 
-{ 
-  display: block;  /* block float the labels to left column, set a width */
-  float: left; 
-  width: 150px; 
-  padding: 0; 
-  margin: 5px 0 0; /* set top margin same as form input - textarea etc. elements */
-  text-align: right; 
-  }
-
-/* use first-letter pseudo-class to underline accesskey, note that */
-/* Firefox 1.07 WIN and Explorer 5.2 Mac don't support first-letter */
-/* pseudo-class on legend elements, but do support it on label elements */
-/* we instead underline first letter on each label element and accesskey */
-/* each input. doing only legends would lessen cognitive load */
-/* opera breaks first letter underlined legens, switched to labels */
-form.fc fieldset label:first-letter { text-decoration:underline;    }
-
-
-/* display: inline; inline display must not be set or will hide submit buttons in IE 5x mac */
-form.fc input, form.fc textarea 
-{
-  width:auto;      /* set width of form elements to auto-size, otherwise watch for wrap on resize */
-  margin:5px 0 0 10px; /* set margin on left of form elements rather than right of
-                          label aligns textarea better in IE */
-  }
-
-/* set margin-left back to zero on reset button (set above) */
-form.fc input#reset { margin-left:0px; }
-
-form.fc textarea { overflow: auto; }
-
-form.fc small 
-{
-  display: block;
-  margin: 0 0 5px 160px; /* instructions/comments left margin set to align w/ right column inputs */
-  padding: 1px 3px;
-  font-size: 88%;
-  }
-
-form.fc .required{font-weight:bold;} /* uses class instead of div, more efficient */
-
-/* setting clear on inputs didn't work consistently, so brs added for degrade */
-form.fc br { clear:left; }
-
-
+.axis path, .axis line {
+                         fill: none;
+                         stroke: #000;
+                         shape-rendering: crispEdges;
+                         }
+*/

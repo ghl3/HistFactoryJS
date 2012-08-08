@@ -13,10 +13,21 @@ $(document).ready(function() {
 
 });
 
+// Define the "systematic' class
+function Systematic(name, FracUp, FracDown) {
+    this.name = name;
+    this.FracUp = FracUp;
+    this.FracDown = FracDown;
+}
+
 // Define the 'sample' class
 function Sample(name) {
     this.name = name;
     this.value = 0.0;
+    this.systematics = new Array();
+}
+Sample.prototype.AddSystematic = function(Name, FracUp, FracDown){
+    this.systematics.push( new Systematic(Name, FracUp, FracDown) );
 }
 
 // Define the 'channel' class
@@ -106,6 +117,63 @@ function GetMeasurementObject() {
 // CREATE DOM TREE ELEMENTS FROM JAVASCRIPT OBJECTS:
 //
 
+function CreateDOMFromSystematic(systematic) {
+    // Create a DOM Systematic element
+    // from a Javascript Systematic object
+    var systematic_element = document.createElement('div');    
+    systematic_element.setAttribute('class', 'systematic');
+
+    // Add the 'name' input field
+    var systematic_name = document.createElement('input');
+    systematic_name.setAttribute('type',"text");
+    systematic_name.setAttribute('class',"systematic_name");
+    systematic_name.setAttribute('value', systematic.name );
+    systematic_element.innerHTML += "Syst:";
+    systematic_element.appendChild( systematic_name );
+
+    // Add the 'FracUp' input field
+    var systematic_FracUp = document.createElement('input');
+    systematic_FracUp.setAttribute('type',"text");
+    systematic_FracUp.setAttribute('class',"systematic_FracUp");
+    systematic_FracUp.setAttribute('value', systematic.FracUp );
+    systematic_element.innerHTML += "Up:";
+    systematic_element.appendChild( systematic_FracUp );
+
+    // Add the 'FracDown' input field
+    var systematic_FracDown = document.createElement('input');
+    systematic_FracDown.setAttribute('type',"text");
+    systematic_FracDown.setAttribute('class',"systematic_FracDown");
+    systematic_FracDown.setAttribute('value', systematic.FracDown );
+    systematic_element.innerHTML += "Down:";
+    systematic_element.appendChild( systematic_FracDown );
+
+    // Add a button to delete this div
+    var deletebutton = document.createElement('img');
+    deletebutton.name      = "DeleteSystematicButton";
+    deletebutton.className = "DeleteSystematicButton";
+    deletebutton.src =  'static/images/RedX.jpg';
+    deletebutton.style.width  =  '13px';
+    deletebutton.style.marginLeft  = '2px';
+    deletebutton.style.marginRight = '2px';
+    systematic_element.appendChild( deletebutton );
+
+
+    return systematic_element;
+
+}
+
+function DeleteSystematic() {
+    console.log("Deleting Systematic");
+    $(this).parent().remove();   
+    // Update the Plot
+    MakePlot();
+    return;
+}
+$(document).ready(function() {
+    $('.DeleteSystematicButton').live('click', DeleteSystematic)
+});
+
+
 
 function CreateDOMFromSample(sample) {
     // Create a DOM Sample element
@@ -114,7 +182,7 @@ function CreateDOMFromSample(sample) {
     // First, create the new sample
     var sample_element = document.createElement('div');
     sample_element.setAttribute('class', 'sample');
-    sample_element.innerHTML = "Sample <br>";
+    //sample_element.innerHTML = "Sample <br>";
     
     // Add the 'name' input field
     var sample_name = document.createElement('input');
@@ -141,6 +209,27 @@ function CreateDOMFromSample(sample) {
     deletebutton.style.marginLeft  = '2px';
     deletebutton.style.marginRight = '2px';
     sample_element.appendChild( deletebutton );
+
+    // Add the list of systematics
+    var systematic_list = document.createElement('div');
+    systematic_list.setAttribute('class', 'systematic_list');
+    for(var syst_itr=0; syst_itr<sample.systematics.length; ++syst_itr) {
+	systematic_list.appendChild( CreateDOMFromSystematic(sample.systematics[syst_itr]) );
+    }
+    sample_element.appendChild( systematic_list );
+
+
+    // New Systematic
+    var add_systematic = document.createElement('button');
+    add_systematic.name      = "NewSystematic";
+    add_systematic.className = "NewSystematic";
+    add_systematic.innerHTML = "Add Systematic";
+    
+    //add_systematic.style.width  =  '20px';
+    add_systematic.style.marginLeft  = '2px';
+    add_systematic.style.marginRight = '2px';
+    sample_element.appendChild( add_systematic );
+    sample_element.innerHTML += "<br>";
 
     // Finally, add the sample to the list of samples
     return sample_element;
@@ -201,13 +290,13 @@ function CreateDOMFromChannel(channel) {
 
     // Add the list of samples div
     var sample_list = document.createElement('div');
+    sample_list.innerHTML += "Samples: <br>";
     sample_list.setAttribute('class', 'sample_list');
     for(var sample_itr=0; sample_itr<channel.samples.length; ++sample_itr) {
 	sample_list.appendChild( CreateDOMFromSample(channel.samples[sample_itr]) );
     }
     new_channel.appendChild( sample_list );
     
-
     // Add a 'new sample' button to the channel
     var new_sample_button = document.createElement('input');
     new_sample_button.setAttribute('type','button');
@@ -303,6 +392,31 @@ function AddSampleToChannel(channel) {
 $(document).ready(function() {
     $('.NewSample').live('click', function(){
 	AddSampleToChannel( $(this).parent() );
+    })
+});
+
+function AddSystematicToSample(sample) {
+
+    console.log("Adding Systematic To Sample");
+
+    var new_systematic = new Systematic("", 1.0, 1.0);
+
+    // First, get the list of systematics for this sample
+    var systematic_list = sample.find(".systematic_list");
+    
+    var systematic_element = CreateDOMFromSystematic(new_systematic);
+
+    // Finally, add the systematic to the list of systematics
+    //systematic_list.append(new_systematic);
+    systematic_list.append(systematic_element);
+    
+    console.log("Successfully added systematic to channel");    
+
+    return;
+}
+$(document).ready(function() {
+    $('.NewSystematic').live('click', function(){
+	AddSystematicToSample( $(this).parent() );
     })
 });
 
