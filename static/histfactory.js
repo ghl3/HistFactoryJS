@@ -310,7 +310,7 @@ function CreateDOMFromChannel(channel) {
     new_channel.appendChild( channel_name );
 
     // Add a Line Break
-    new_channel.appendChild( document.createElement('br') );
+    //new_channel.appendChild( document.createElement('br') );
 
     // Add the 'data' input field
     var channel_data = document.createElement('input');
