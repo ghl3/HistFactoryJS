@@ -656,9 +656,15 @@ function FitMeasurement() {
 	}
 	else {
 	    console.log("Successfully fit measurement");
-	    var fit_result = data["result"];
-	    console.log(fit_result);
-	    MakePlotFromMeasurement(fit_result);
+
+	    // Make the fitted plot
+	    var fitted_bins = data["fitted_bins"];
+	    console.log(fitted_bins);
+	    MakePlotFromMeasurement(fitted_bins);
+
+	    // Print the fitted values
+	    console.log("Fitted Values:");
+	    console.log(data['fit_result']);
 	}
     }
 
