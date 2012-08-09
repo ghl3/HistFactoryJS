@@ -113,7 +113,8 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
         for sample_dict in chan_dict["samples"]:
             sample_name = sample_dict["name"]
             sample = ROOT.RooStats.HistFactory.Sample( str(sample_name) )
-            #sample.AddOverallSys( "syst1",  0.95, 1.05 )
+            for syst in sample_dict["systematics"]:                
+                sample.AddOverallSys( str(syst["name"]),  float(syst["FracDown"]), float(syst["FracUp"]) )
             sample.SetValue( float(sample_dict['value']) )
             if sample_dict["signal"]:
                 sample.AddNormFactor( "SigXsecOverSM", 1, 0, 3 )

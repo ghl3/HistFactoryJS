@@ -3,7 +3,9 @@ $(document).ready(function() {
     console.log("Document Ready");
 
     $("#fitted_table").hide();
-    
+    LoadCacheInfo();
+
+/*    
     if(localStorage.getItem("measurement") != null) {
 	console.log(localStorage.getItem("measurement"));
 	var cached_measurement = JSON.parse(localStorage.getItem("measurement")); //$.Storage.get("channel_list");
@@ -12,6 +14,7 @@ $(document).ready(function() {
 	CreateChannelListDOMFromMeasurement(cached_measurement);
 	MakePlotFromMeasurement(cached_measurement);
     }
+*/
 
 });
 
@@ -41,6 +44,58 @@ function Channel(name) {
 }
 Channel.prototype.AddSample = function(sample){
     this.samples.push(sample);
+}
+
+
+function CacheInfo() {
+    // Cache all info currently
+    // entered into the site
+
+    // Save the measurement info
+    var measurement = GetMeasurementObject();
+    console.log("Caching measurement object in local storage:");
+    console.log(measurement);
+    localStorage.setItem("measurement", JSON.stringify(measurement));
+
+    // Save the Signal name
+    signal_name = $("#signal_name").val();    
+    localStorage.setItem("signal_name", signal_name);
+
+    // Save the Lumi Uncertainty
+    lumi_uncertainty = $("#lumi_uncertainty").val();    
+    localStorage.setItem("lumi_uncertainty", lumi_uncertainty);
+
+    console.log("Caching: " + signal_name + " " + lumi_uncertainty);
+
+}
+
+
+function LoadCacheInfo() {
+
+    if(localStorage.getItem("measurement") != null) {
+	console.log(localStorage.getItem("measurement"));
+	var cached_measurement = JSON.parse(localStorage.getItem("measurement")); //$.Storage.get("channel_list");
+	console.log("Using cached measurement:");
+	console.log(cached_measurement);
+	CreateChannelListDOMFromMeasurement(cached_measurement);
+	MakePlotFromMeasurement(cached_measurement);
+    }
+
+    // Set the Signal name
+    if(localStorage.getItem("signal_name") != null) {
+	signal_name = localStorage.getItem("signal_name");
+	$("#signal_name").val(signal_name);
+	console.log("Loading Cache: " + signal_name);
+    }
+
+    // Set the lumi uncertainty
+    if(localStorage.getItem("lumi_uncertainty") != null) {
+	lumi_uncertainty = localStorage.getItem("lumi_uncertainty");
+	$("#lumi_uncertainty").val(lumi_uncertainty);
+	console.log("Loading Cache: " + lumi_uncertainty);
+    }
+
+
 }
 
 //
@@ -207,6 +262,7 @@ function DeleteSystematic() {
     $(this).parent().remove();   
     // Update the Plot
     MakePlot();
+    CacheInfo();
     return;
 }
 $(document).ready(function() {
@@ -293,6 +349,7 @@ function DeleteSample() {
     $(this).parent().remove();   
     // Update the Plot
     MakePlot();
+    CacheInfo();
     return;
 }
 $(document).ready(function() {
@@ -365,7 +422,7 @@ function DeleteChannel() {
     console.log("Deleting Channel");
     $(this).parent().remove();
     // Update the Plot
-    MakePlot();
+    CacheInfo();
     return;
 }
 $(document).ready(function() {
@@ -510,6 +567,7 @@ $(document).ready(function() {
     $('.NewSystematic').live('click', function(){
 	AddSystematicToSample( $(this).parent() );
 	MakePlot();
+	CacheInfo();
     })
 });
 
@@ -658,11 +716,14 @@ function MakePlotFromMeasurement(measurement) {
     console.log("Successfully made plot");
 
     // And save this info into the html5 storage
+    // CacheInfo();
+    /*
     var measurement = GetMeasurementObject();
     console.log("Caching measurement object in local storage:");
     console.log(measurement);
     localStorage.setItem("measurement", JSON.stringify(measurement));
-
+*/
+    
 }
 
 function MakePlot() {
@@ -670,11 +731,15 @@ function MakePlot() {
     // current values in the DOM
     var measurement = GetMeasurementObject();
     MakePlotFromMeasurement(measurement);
+    CacheInfo();
 }
 
 // Attach this function to the proper button
 $(document).ready(function() {
-    $('#update_button').live('click', MakePlot)
+    $('#update_button').live('click', function() {
+	MakePlot;
+        CacheInfo();
+    });
 });
 
 
@@ -685,6 +750,7 @@ function UpdateOnEnter(event) {
 	console.log("Found Enter");
 	// Update the Plot
 	MakePlot();
+	CacheInfo();
     }
 }
 $(document).ready(function() {
@@ -721,6 +787,7 @@ function FitMeasurement() {
 	    var fitted_bins = data["fitted_bins"];
 	    console.log(fitted_bins);
 	    MakePlotFromMeasurement(fitted_bins);
+	    CacheInfo();
 
 	    // Print the fitted values
 	    console.log("Fitted Values:");
