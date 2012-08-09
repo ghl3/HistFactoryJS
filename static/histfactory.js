@@ -1,6 +1,8 @@
 
 $(document).ready(function() {
     console.log("Document Ready");
+
+    $("#fitted_table").hide();
     
     if(localStorage.getItem("measurement") != null) {
 	console.log(localStorage.getItem("measurement"));
@@ -24,6 +26,7 @@ function Systematic(name, FracUp, FracDown) {
 function Sample(name) {
     this.name = name;
     this.value = 0.0;
+    this.signal = false;
     this.systematics = new Array();
 }
 Sample.prototype.AddSystematic = function(Name, FracUp, FracDown){
@@ -88,6 +91,11 @@ function CreateSampleListFromDOM(sample_list_dom) {
 
 	var sample = new Sample(name);
 	sample.value = value;
+
+	// Check if this systematic is "signal"
+	signal_name = $("#signal_name").val();
+	console.log("Signal Name: " + signal_name);
+	if(name==signal_name) sample.signal=true;
 
 	// Get the systematics and add them
 	// to this sample
@@ -231,6 +239,19 @@ function CreateDOMFromSample(sample) {
     sample_value.setAttribute('value', sample.value );
     sample_element.innerHTML += "Value:";
     sample_element.appendChild( sample_value );
+
+    // Add a checkbox for signal
+    /*
+    var checkbox = document.createElement('input');
+    checkbox.type = "checkbox";
+    checkbox.name = "is_signal";
+    checkbox.name = "is_signal";
+    //var label = document.createElement('label')
+    //label.appendChild(document.createTextNode('sig'))
+    //sample_element.appendChild(label);
+    sample_element.appendChild(checkbox);
+*/
+
     
     // Add a button to delete this div
     var deletebutton = document.createElement('img');
@@ -367,6 +388,45 @@ function CreateChannelListDOMFromMeasurement(measurement) {
     console.log("Successfully created channel DOM from measurement");
 }
 
+
+function CreateFittedValueDOMTable(fitted_param_list){
+    // Expects a list of dictionaries
+    // of the following form:
+    // [ {"name" : name, "val" : val,
+    //    "error": error, "errorLo" : errorLo, "errorHi" : errorHi}, ... ]
+    
+    // Create the Table
+    var table = document.createElement('table');
+    table.setAttribute('id', 'fitted_table');
+
+    // Add the Title
+    var row = table.insertRow(0);
+
+    var cell = row.insertCell(0);
+    cell.innerHTML = "Param";
+    var cell = row.insertCell(1);
+    cell.innerHTML = "Fitted Val";
+    var cell = row.insertCell(2);
+    cell.innerHTML = "Error";
+
+    for(var param_itr=0; param_itr<fitted_param_list.length; ++param_itr) {
+	var dict = fitted_param_list[param_itr];
+
+	var row = table.insertRow(param_itr+1);
+	var cell = row.insertCell(0);
+	cell.innerHTML = dict['name'];
+	cell.width='60px';
+	var cell = row.insertCell(1);
+	cell.innerHTML = dict['val'].toPrecision(4);
+	cell.width='100px';
+	var cell = row.insertCell(2);
+	cell.innerHTML = dict['error'].toPrecision(4);
+	cell.width='100px';
+    }
+    
+    return table;
+
+}
 
 //
 // APPEND NEW DOM TREE OBJECTS
@@ -665,6 +725,9 @@ function FitMeasurement() {
 	    // Print the fitted values
 	    console.log("Fitted Values:");
 	    console.log(data['fit_result']);
+	    var table_element = CreateFittedValueDOMTable(data['fit_result']);
+	    $('#fitted_table').replaceWith(table_element);
+	    $('#fitted_table').show();
 	}
     }
 

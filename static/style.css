@@ -91,9 +91,16 @@ footer
   margin-bottom: 30px;
   }
 
+#fitted_table
+{ 
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  border: 1px solid black;
+  margin-bottom: 30px;
+}
 
 /* The Classes */
-
 .sample
 {  
   width: 260px;
