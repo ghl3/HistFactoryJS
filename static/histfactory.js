@@ -707,6 +707,7 @@ $(document).ready(function() {
     $('#update_button').live('click', function() {
 	MakePlot();
         CacheInfo();
+	$("#fitted_table").hide();
     });
 });
 
