@@ -132,19 +132,24 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
 
 
 def MakeFittedValDictFromFitResult(result):
-    """ Given a fit result, find the fitted parameters
+    """ Given a RooFitResult, find the fitted parameters
+    as well as their errors as a list of dictionaries
     
     """
     fit_result_list = []
 
     pars = result.floatParsFinal()
-    print pars
     num_params = pars.getSize()
     for param_itr in range(num_params):
         param = pars.at(param_itr)
-        print param.GetName(), param.getVal(), param.getError(), param.getErrorLo(), param.getErrorHi()
-        param_dict = {"name" : param.GetName(), "val" : param.getVal(),
-                      "error": param.getError(), "errorLo" : param.getErrorLo(), "errorHi" : param.getErrorHi()}
+
+        param_dict = {}
+        param_dict["name"] = param.GetName()
+        param_dict["val"] = param.getVal()
+        param_dict["error"] = param.getError()
+        param_dict["errorLo"] = param.getErrorLo()
+        param_dict["errorHi"] = param.getErrorHi()
+
         fit_result_list.append(param_dict)
 
     return fit_result_list

@@ -191,15 +191,24 @@ function GetMeasurementObject() {
     // Get the current measurement
     // as described by the DOM tree
 
-    var measurement = new Array();
+
+    var measurement_info = {};
+    measurement_info["signal_name"] = $("#signal_name").val();
+    measurement_info["lumi_uncertainty"] = $("#lumi_uncertainty").val();
+
+    var channel_list_object = new Array();
 
     // Get the list of channels
-    var channel_list = $('.channel');
-    for(var channel_idx = 0; channel_idx < channel_list.length; ++channel_idx){
-	channel = channel_list[channel_idx];
+    var channel_list_element = $('.channel');
+    for(var channel_idx = 0; channel_idx < channel_list_element.length; ++channel_idx){
+	channel = channel_list_element[channel_idx];
 	measurement.push(CreateChannelFromDOM(channel));
     }
     
+    var measurement = new Array();
+    measurement["measurement_info"] = measurement_info;
+    measurement["channel_list"] = channel_list_object;
+
     console.log("Final Measurement:");
     console.log(measurement);
 
