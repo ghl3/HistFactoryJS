@@ -51,7 +51,7 @@ def FitMeasurement():
     fitted_params = MakeFittedValDictFromFitResult(fit_result)
 
     # For now, just a dummy for the Fitted Bin Height Dict
-    fitted_bins = copy.deepcopy(measurement_dict)
+    fitted_bins = copy.deepcopy(measurement_dict["channel_list"])
     
     for channel in fitted_bins:
         channel["data"] = float(channel["data"])
@@ -85,15 +85,21 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     the workspace, and return the RooFitResult
 
     """
+    
+    channel_list = measurement_dict["channel_list"]
+    measurement_info = measurement_dict["measurement_info"]
+
+    # Get the name of the sample
+    # that is interpreted as signal
+    signal_sample = str(measurement_info["signal_name"])
 
     meas = ROOT.RooStats.HistFactory.Measurement("meas", "meas")
-    
     meas.SetPOI( "SigXsecOverSM" )
     meas.SetLumi( 1.0 )
-    meas.SetLumiRelErr( 0.10 )
+    meas.SetLumiRelErr( float(measurement_info["lumi_uncertainty"]) )
     meas.SetExportOnly( False )
     
-    for chan_dict in measurement_dict:
+    for chan_dict in channel_list:
         chan = ROOT.RooStats.HistFactory.Channel( str(chan_dict["name"]) )
         chan.SetData( float(chan_dict['data']) )
         # chan.SetStatErrorConfig( 0.05, "Poisson" )
@@ -104,7 +110,7 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
             for syst in sample_dict["systematics"]:                
                 sample.AddOverallSys( str(syst["name"]),  float(syst["FracDown"]), float(syst["FracUp"]) )
             sample.SetValue( float(sample_dict['value']) )
-            if sample_dict["signal"]:
+            if sample_name == signal_sample:
                 sample.AddNormFactor( "SigXsecOverSM", 1, 0, 3 )
             chan.AddSample( sample )
         

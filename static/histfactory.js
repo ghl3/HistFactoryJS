@@ -29,7 +29,7 @@ function Systematic(name, FracUp, FracDown) {
 function Sample(name) {
     this.name = name;
     this.value = 0.0;
-    this.signal = false;
+    //this.signal = false;
     this.systematics = new Array();
 }
 Sample.prototype.AddSystematic = function(Name, FracUp, FracDown){
@@ -57,6 +57,7 @@ function CacheInfo() {
     console.log(measurement);
     localStorage.setItem("measurement", JSON.stringify(measurement));
 
+    /*
     // Save the Signal name
     signal_name = $("#signal_name").val();    
     localStorage.setItem("signal_name", signal_name);
@@ -64,23 +65,50 @@ function CacheInfo() {
     // Save the Lumi Uncertainty
     lumi_uncertainty = $("#lumi_uncertainty").val();    
     localStorage.setItem("lumi_uncertainty", lumi_uncertainty);
-
-    console.log("Caching: " + signal_name + " " + lumi_uncertainty);
+*/
+    // console.log("Caching: " + signal_name + " " + lumi_uncertainty);
 
 }
 
 
 function LoadCacheInfo() {
 
-    if(localStorage.getItem("measurement") != null) {
-	console.log(localStorage.getItem("measurement"));
-	var cached_measurement = JSON.parse(localStorage.getItem("measurement")); //$.Storage.get("channel_list");
-	console.log("Using cached measurement:");
-	console.log(cached_measurement);
-	CreateChannelListDOMFromMeasurement(cached_measurement);
-	MakePlotFromMeasurement(cached_measurement);
+    if(localStorage.getItem("measurement") == null) {
+	return;
     }
 
+    var cached_measurement = JSON.parse(localStorage.getItem("measurement")); //$.Storage.get("channel_list");
+    console.log(cached_measurement);
+
+    if(cached_measurement.hasOwnProperty("channel_list")) {
+	CreateChannelListDOMFromMeasurement(cached_measurement["channel_list"]);
+	MakePlotFromMeasurement(cached_measurement["channel_list"]);
+    }
+
+
+
+    if(cached_measurement.hasOwnProperty("measurement_info")) {
+	var measurement_info = cached_measurement["measurement_info"];
+
+	if(measurement_info.hasOwnProperty("signal_name")) {
+	    var signal_name = measurement_info["signal_name"];
+	    $("#signal_name").val(signal_name);
+	    console.log("Loading Cache: " + signal_name);
+	}
+
+	if(measurement_info.hasOwnProperty("lumi_uncertainty")) {
+	    var lumi_uncertainty = measurement_info["lumi_uncertainty"];
+	    $("#lumi_uncertainty").val(lumi_uncertainty);
+	    console.log("Loading Cache: " + lumi_uncertainty);
+	}
+
+	//CreateChannelListDOMFromMeasurement(cached_measurement["channel_list"]);
+	// MakePlotFromMeasurement(cached_measurement["channel_list"]);
+    }
+
+
+    return;
+    /*
     // Set the Signal name
     if(localStorage.getItem("signal_name") != null) {
 	signal_name = localStorage.getItem("signal_name");
@@ -94,7 +122,7 @@ function LoadCacheInfo() {
 	$("#lumi_uncertainty").val(lumi_uncertainty);
 	console.log("Loading Cache: " + lumi_uncertainty);
     }
-
+*/
 
 }
 
@@ -148,10 +176,11 @@ function CreateSampleListFromDOM(sample_list_dom) {
 	sample.value = value;
 
 	// Check if this systematic is "signal"
+	/*
 	signal_name = $("#signal_name").val();
 	console.log("Signal Name: " + signal_name);
 	if(name==signal_name) sample.signal=true;
-
+*/
 	// Get the systematics and add them
 	// to this sample
 	var systematic_list = CreateSystematicListFromDOM( sample_element.getElementsByClassName('systematic_list')[0] );
@@ -191,7 +220,6 @@ function GetMeasurementObject() {
     // Get the current measurement
     // as described by the DOM tree
 
-
     var measurement_info = {};
     measurement_info["signal_name"] = $("#signal_name").val();
     measurement_info["lumi_uncertainty"] = $("#lumi_uncertainty").val();
@@ -202,10 +230,10 @@ function GetMeasurementObject() {
     var channel_list_element = $('.channel');
     for(var channel_idx = 0; channel_idx < channel_list_element.length; ++channel_idx){
 	channel = channel_list_element[channel_idx];
-	measurement.push(CreateChannelFromDOM(channel));
+	channel_list_object.push(CreateChannelFromDOM(channel));
     }
     
-    var measurement = new Array();
+    var measurement = {};
     measurement["measurement_info"] = measurement_info;
     measurement["channel_list"] = channel_list_object;
 
@@ -739,7 +767,7 @@ function MakePlot() {
     // Make the plot based on the
     // current values in the DOM
     var measurement = GetMeasurementObject();
-    MakePlotFromMeasurement(measurement);
+    MakePlotFromMeasurement(measurement["channel_list"]);
     CacheInfo();
 }
 
