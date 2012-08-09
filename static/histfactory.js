@@ -5,17 +5,6 @@ $(document).ready(function() {
     $("#fitted_table").hide();
     LoadCacheInfo();
 
-/*    
-    if(localStorage.getItem("measurement") != null) {
-	console.log(localStorage.getItem("measurement"));
-	var cached_measurement = JSON.parse(localStorage.getItem("measurement")); //$.Storage.get("channel_list");
-	console.log("Using cached measurement:");
-	console.log(cached_measurement);
-	CreateChannelListDOMFromMeasurement(cached_measurement);
-	MakePlotFromMeasurement(cached_measurement);
-    }
-*/
-
 });
 
 // Define the "systematic' class
@@ -57,17 +46,6 @@ function CacheInfo() {
     console.log(measurement);
     localStorage.setItem("measurement", JSON.stringify(measurement));
 
-    /*
-    // Save the Signal name
-    signal_name = $("#signal_name").val();    
-    localStorage.setItem("signal_name", signal_name);
-
-    // Save the Lumi Uncertainty
-    lumi_uncertainty = $("#lumi_uncertainty").val();    
-    localStorage.setItem("lumi_uncertainty", lumi_uncertainty);
-*/
-    // console.log("Caching: " + signal_name + " " + lumi_uncertainty);
-
 }
 
 
@@ -85,8 +63,6 @@ function LoadCacheInfo() {
 	MakePlotFromMeasurement(cached_measurement["channel_list"]);
     }
 
-
-
     if(cached_measurement.hasOwnProperty("measurement_info")) {
 	var measurement_info = cached_measurement["measurement_info"];
 
@@ -102,27 +78,10 @@ function LoadCacheInfo() {
 	    console.log("Loading Cache: " + lumi_uncertainty);
 	}
 
-	//CreateChannelListDOMFromMeasurement(cached_measurement["channel_list"]);
-	// MakePlotFromMeasurement(cached_measurement["channel_list"]);
     }
 
 
     return;
-    /*
-    // Set the Signal name
-    if(localStorage.getItem("signal_name") != null) {
-	signal_name = localStorage.getItem("signal_name");
-	$("#signal_name").val(signal_name);
-	console.log("Loading Cache: " + signal_name);
-    }
-
-    // Set the lumi uncertainty
-    if(localStorage.getItem("lumi_uncertainty") != null) {
-	lumi_uncertainty = localStorage.getItem("lumi_uncertainty");
-	$("#lumi_uncertainty").val(lumi_uncertainty);
-	console.log("Loading Cache: " + lumi_uncertainty);
-    }
-*/
 
 }
 
@@ -175,12 +134,6 @@ function CreateSampleListFromDOM(sample_list_dom) {
 	var sample = new Sample(name);
 	sample.value = value;
 
-	// Check if this systematic is "signal"
-	/*
-	signal_name = $("#signal_name").val();
-	console.log("Signal Name: " + signal_name);
-	if(name==signal_name) sample.signal=true;
-*/
 	// Get the systematics and add them
 	// to this sample
 	var systematic_list = CreateSystematicListFromDOM( sample_element.getElementsByClassName('systematic_list')[0] );
@@ -537,12 +490,9 @@ function AddNewChannel() {
 
     var new_channel = new Channel("");
 
-    // First, get a handle on the channel_list div
+    // Add the new channel to the Channel_List DOM Element
     var channel_list = document.getElementById('Channel_List');
-
     var channel_element = CreateDOMFromChannel(new_channel);
-
-    // Finally, append the channel to the channel_list
     channel_list.appendChild(channel_element);
 
     console.log("Successfully Added a New Channel");
@@ -562,13 +512,9 @@ function AddSampleToChannel(channel) {
 
     var new_sample = new Sample("");
 
-    // First, get the list of samples for this channel
+    // Add the sample to the 'sample_list' DOM Element
     var sample_list = channel.find(".sample_list");
-    
     var sample_element = CreateDOMFromSample(new_sample);
-
-    // Finally, add the sample to the list of samples
-    //sample_list.append(new_sample);
     sample_list.append(sample_element);
     
     console.log("Successfully added sample to channel");    
@@ -587,13 +533,9 @@ function AddSystematicToSample(sample) {
 
     var new_systematic = new Systematic("", 1.0, 1.0);
 
-    // First, get the list of systematics for this sample
+    // Add the systematic to the systematic_list DOM element
     var systematic_list = sample.find(".systematic_list");
-    
     var systematic_element = CreateDOMFromSystematic(new_systematic);
-
-    // Finally, add the systematic to the list of systematics
-    //systematic_list.append(new_systematic);
     systematic_list.append(systematic_element);
     
     console.log("Successfully added systematic to channel");    
@@ -607,8 +549,6 @@ $(document).ready(function() {
 	CacheInfo();
     })
 });
-
-
 
 
 //
@@ -752,15 +692,6 @@ function MakePlotFromMeasurement(measurement) {
     $.plot($("#plot"), all_sample_data, options);
     console.log("Successfully made plot");
 
-    // And save this info into the html5 storage
-    // CacheInfo();
-    /*
-    var measurement = GetMeasurementObject();
-    console.log("Caching measurement object in local storage:");
-    console.log(measurement);
-    localStorage.setItem("measurement", JSON.stringify(measurement));
-*/
-    
 }
 
 function MakePlot() {
@@ -823,8 +754,6 @@ function FitMeasurement() {
 	    // Make the fitted plot
 	    var fitted_bins = data["fitted_bins"];
 	    console.log(fitted_bins);
-	    // MakePlotFromMeasurement(fitted_bins);
-	    // CacheInfo();
 
 	    // Print the fitted values
 	    console.log("Fitted Values:");
