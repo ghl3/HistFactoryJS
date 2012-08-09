@@ -26,25 +26,56 @@ def index():
 
 @app.route('/FitMeasurement', methods=['GET', 'POST'])
 def FitMeasurement():
+    """ Take a POST http request and return fit info to client javascript
+
+    Given a JSON measurement string, create a result that contains:
+
+    - A list of fitted values for parameters (for a table)
+    - A list of fitted bin heights (for plotting)
+
+    Include a success flag in the return object
+
+    """
 
     # Apply some sanity checks
     if request.method != 'POST':
         print "FitMeasurement() - ERROR: Expected POST http request"
         return jsonify(flag="error")
 
-    # Get the data to be fit
+    # Get the data to be fit from the JSON
     measurement_string_JSON = request.form['measurement']
-    measurement = json.loads( measurement_string_JSON )
+    measurement_dict = json.loads( measurement_string_JSON )
 
+    # Get the RooFitResult and the Fitted Value Dict
+    fit_result = CreateHistFactoryFromMeasurement(measurement_dict)    
+    fitted_params = MakeFittedValDictFromFitResult(fit_result)
+
+    # For now, just a dummy for the Fitted Bin Height Dict
+    fitted_bins = copy.deepcopy(measurement_dict)
+    
+    for channel in fitted_bins:
+        channel["data"] = float(channel["data"])
+        
+        for sample in channel["samples"]:
+            sample["value"] = random.uniform(.9, 1.1)*float(sample["value"])
+        pass
+
+    # Clean Up
+    fit_result.Delete()
+    del fit_result
+
+    '''
+    return (fit_dict, fitted_bins)
     (fit_result, fitted_bins) = FitMeasurementUsingHistFactory(measurement)
+    '''
 
     # Success
-    # For now, just return the input
-    return jsonify(flag="success", fit_result=fit_result, fitted_bins=fitted_bins)
+    return jsonify(flag="success", fitted_params=fitted_params, fitted_bins=fitted_bins)
 
-
+'''
 def FitMeasurementUsingHistFactory(measurement_dict):
-    """ Create a HistFactory measurement object from a python dict
+    """ Given a JSON measurement string, 
+    return a RooFitResult and a dict of fitted bin heights
 
     This is the mapping between the simple Javascript/Python measurement
     dictionary (the one that directly is made via the site's gui) and the
@@ -66,7 +97,9 @@ def FitMeasurementUsingHistFactory(measurement_dict):
 
     # Make the HistFactory Model
     fit_result = CreateHistFactoryFromMeasurement(measurement_dict)    
-    fit_dict = MakeMeasurementDictFromFitResult(fit_result)
+    fit_dict = MakeFittedValDictFromFitResult(fit_result)
+    fit_result.Delete()
+    del fit_result
 
     # For now, just a dummy for the fitted bin heights
     fitted_bins = copy.deepcopy(measurement_dict)
@@ -79,13 +112,13 @@ def FitMeasurementUsingHistFactory(measurement_dict):
         pass
 
     return (fit_dict, fitted_bins)
-
+'''
 
 def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     """ 
-    This is temporarily a separate module until I fix
-    the ROOT/python version mismatch.
-    Then, it will be incorporated into the main app :)
+    Create a HistFactory model from a list of channel
+    dictionaries, each giving data and a set of samples
+    and systematics.
 
     The input object looks like this:
     
@@ -94,7 +127,8 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     ...
     ]
 
-    Simply convert to a HistFactory Measurement and return
+    Create the HistFactory object, make a workspace, fit
+    the workspace, and return the RooFitResult
 
     """
 
@@ -140,11 +174,10 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
 
     #MakeMeasurementDictFromFitResult(fit_result)
 
-
     return fit_result
 
 
-def MakeMeasurementDictFromFitResult(result):
+def MakeFittedValDictFromFitResult(result):
     """ Given a fit result, find the fitted parameters
     
     """

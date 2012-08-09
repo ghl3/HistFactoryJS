@@ -791,8 +791,8 @@ function FitMeasurement() {
 
 	    // Print the fitted values
 	    console.log("Fitted Values:");
-	    console.log(data['fit_result']);
-	    var table_element = CreateFittedValueDOMTable(data['fit_result']);
+	    console.log(data['fitted_params']);
+	    var table_element = CreateFittedValueDOMTable(data['fitted_params']);
 	    $('#fitted_table').replaceWith(table_element);
 	    $('#fitted_table').show();
 	}
