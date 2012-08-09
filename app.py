@@ -48,17 +48,21 @@ def FitMeasurement():
     measurement_dict = json.loads( measurement_string_JSON )
 
     # Get the RooFitResult and the Fitted Value Dict
-    fit_result = CreateHistFactoryFromMeasurement(measurement_dict)    
+    (fit_result, fitted_bins) = CreateHistFactoryFromMeasurement(measurement_dict)    
     fitted_params = MakeFittedValDictFromFitResult(fit_result)
 
-    # For now, just a dummy for the Fitted Bin Height Dict
-    fitted_bins = copy.deepcopy(measurement_dict["channel_list"])
-    
-    for channel in fitted_bins:
-        channel["data"] = float(channel["data"])
-        
+    print "Fitted Bins: ", fitted_bins
+
+    # Copy the original measurement, and then we will modify
+    # the sample values
+    fitted_measurement = copy.deepcopy(measurement_dict["channel_list"])
+
+    for channel in fitted_measurement:
+        channel_name = channel["name"]
         for sample in channel["samples"]:
-            sample["value"] = random.uniform(.9, 1.1)*float(sample["value"])
+            sample_name = sample["name"]
+            sample["value"] = fitted_bins[channel_name][sample_name]
+            #random.uniform(.9, 1.1)*float(sample["value"])
         pass
 
     # Clean Up
@@ -67,7 +71,7 @@ def FitMeasurement():
     #del fit_result
 
     # Success
-    return jsonify(flag="success", fitted_params=fitted_params, fitted_bins=fitted_bins)
+    return jsonify(flag="success", fitted_params=fitted_params, fitted_bins=fitted_measurement)
 
 
 def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
@@ -131,13 +135,14 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     model = combined_config.GetPdf();
     fit_result = model.fitTo(simData, ROOT.RooCmdArg("Minos",True), ROOT.RooCmdArg("PrintLevel",1), ROOT.RooCmdArg("Save",True));
 
+    fitted_bins = getFittedBinHeights(combined_config, simData)
+
     # Delete the model
     wspace.IsA().Destructor( wspace )
     meas.IsA().Destructor( meas )
 
-    #MakeMeasurementDictFromFitResult(fit_result)
 
-    return fit_result
+    return (fit_result, fitted_bins)
 
 
 def MakeFittedValDictFromFitResult(result):
@@ -162,6 +167,107 @@ def MakeFittedValDictFromFitResult(result):
         fit_result_list.append(param_dict)
 
     return fit_result_list
+
+
+def getFittedBinHeights(model_config, data):
+    """
+    This is just a place-holder module
+    to get the fitted bin heights from a 
+    histfactory model
+
+    It will be incorproated into app.py
+    when (if) it works...
+    """
+
+
+    modelPdf = model_config.GetPdf();
+    
+    if modelPdf.ClassName()!="RooSimultaneous":
+        raise Exception("Expected RooSimultaneous as pdf")
+
+    simPdf = modelPdf
+    channelCat = simPdf.indexCat()
+
+    dataByCategory = data.split(channelCat)
+
+    channelPdfVec=[]
+    channelObservVec=[]
+    channelNameVec=[]
+
+    # Loop over channels
+    chan_itr=channelCat.typeIterator()
+    while True:
+        tt = chan_itr.Next()
+        if tt == None: break
+
+        print "Working on channel: ", tt.GetName()
+        pdftmp = simPdf.getPdf(tt.GetName())
+        obstmp = simPdf.getObservables(model_config.GetObservables())
+        dataForChan=dataByCategory.FindObject(tt.GetName())
+
+        print "Found observables and pdf: ", pdftmp.GetName(), obstmp.GetName(), dataForChan.GetName()
+
+        channelPdfVec.append(pdftmp)
+        channelObservVec.append(obstmp)
+        channelNameVec.append(tt.GetName())
+        '''
+        continue
+
+        dataHistName = str("hData_" + tt.GetName())
+        obs = obstmp.first()
+        dataHist = dataForChan.RooAbsData.createHistogram("myDataHist", obs)
+        #dataHist = dataForChan.createHistogram("myDataHist"dataHistName, obs)
+        channelDataVec.append(dataHist)
+        '''
+
+    channelSumNodeVec=[]
+
+    # Now, loop over the channel pdf's
+    for (name, pdf) in zip(channelNameVec, channelPdfVec):
+        
+        # Loop over the components
+        components=pdf.getComponents()
+        argItr=components.createIterator()
+        while True:
+            arg = argItr.Next()
+            if arg == None: break
+
+            ClassName=arg.ClassName()
+            if ClassName == "RooRealSumPdf":
+                channelSumNodeVec.append(arg)
+                print "Found RooRealSumPdf: ", arg.GetName()
+                break
+            pass
+        pass
+    
+
+    # Make the dictionary to be returned
+    fitted_bin_heights = {}
+
+    # Now we have all the SumPdf's
+    # Let's get the values
+    for (Channel, pdf, observables, sumPdf) in zip(channelNameVec, channelPdfVec, channelObservVec, channelSumNodeVec):
+
+        fitted_bin_heights[Channel] = {}
+
+        nodes = sumPdf.funcList()
+        sampleItr = nodes.createIterator()
+        while True:
+            sample = sampleItr.Next()
+            if sample == None: break
+
+            SampleName = sample.GetName()
+            SampleName = SampleName.replace("L_x_", "")
+            SampleName = SampleName[ : SampleName.find(Channel)-1]
+
+            fitted_bin_heights[Channel][SampleName] = sample.getVal()
+
+            print "Channel: %s Sample: %s Pdf: %s Val: %s" % (Channel, SampleName, sample.GetName(), sample.getVal())
+        pass
+
+    return fitted_bin_heights
+
+
 
 
 if __name__ == '__main__':

@@ -753,6 +753,7 @@ function FitMeasurement() {
 
 	    // Make the fitted plot
 	    var fitted_bins = data["fitted_bins"];
+	    MakePlotFromMeasurement(fitted_bins)
 	    console.log(fitted_bins);
 
 	    // Print the fitted values
