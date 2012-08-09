@@ -18,6 +18,7 @@ import copy
 
 app = Flask(__name__)
 
+ROOT.SetMemoryPolicy( ROOT.kMemoryStrict )
 
 @app.route('/')
 def index():
@@ -61,8 +62,9 @@ def FitMeasurement():
         pass
 
     # Clean Up
-    fit_result.Delete()
-    del fit_result
+    fit_result.IsA().Destructor( fit_result )
+    #fit_result.Delete()
+    #del fit_result
 
     # Success
     return jsonify(flag="success", fitted_params=fitted_params, fitted_bins=fitted_bins)
@@ -116,21 +118,22 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
         
         meas.AddChannel( chan )
         
-        pass
-
     # Now, print and do the fit
     meas.PrintTree();
 
     # Fit the workspace
     wspace = ROOT.RooStats.HistFactory.HistoToWorkspaceFactoryFast.MakeCombinedModel( meas );
     combined_config = wspace.obj("ModelConfig");
-    simData = wspace.obj("obsData");
     simData = wspace.data("obsData");
     constrainedParams = combined_config.GetNuisanceParameters();
     POIs = combined_config.GetParametersOfInterest();
     
     model = combined_config.GetPdf();
     fit_result = model.fitTo(simData, ROOT.RooCmdArg("Minos",True), ROOT.RooCmdArg("PrintLevel",1), ROOT.RooCmdArg("Save",True));
+
+    # Delete the model
+    wspace.IsA().Destructor( wspace )
+    meas.IsA().Destructor( meas )
 
     #MakeMeasurementDictFromFitResult(fit_result)
 
