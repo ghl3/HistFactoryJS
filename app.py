@@ -64,55 +64,9 @@ def FitMeasurement():
     fit_result.Delete()
     del fit_result
 
-    '''
-    return (fit_dict, fitted_bins)
-    (fit_result, fitted_bins) = FitMeasurementUsingHistFactory(measurement)
-    '''
-
     # Success
     return jsonify(flag="success", fitted_params=fitted_params, fitted_bins=fitted_bins)
 
-'''
-def FitMeasurementUsingHistFactory(measurement_dict):
-    """ Given a JSON measurement string, 
-    return a RooFitResult and a dict of fitted bin heights
-
-    This is the mapping between the simple Javascript/Python measurement
-    dictionary (the one that directly is made via the site's gui) and the
-    HistFactory Measurement object (written in c++).
-
-    This is just a temporary, dummy version
-
-    The output format should be identical to the input format:
-    
-    [ {name:"MyChannelA", data:"35", samples:[{name:"ttbar", value:12}, {name:"WJets", value:20] }, 
-      {name:"MyChannelB", data:"40", samples:[{name:"ttbar", value:18}, {name:"WJets", value:23] }, 
-    ...
-    ]
-
-    """
-
-    # For now, simply randomly perturb
-    # in the input to "fit"
-
-    # Make the HistFactory Model
-    fit_result = CreateHistFactoryFromMeasurement(measurement_dict)    
-    fit_dict = MakeFittedValDictFromFitResult(fit_result)
-    fit_result.Delete()
-    del fit_result
-
-    # For now, just a dummy for the fitted bin heights
-    fitted_bins = copy.deepcopy(measurement_dict)
-    
-    for channel in fitted_bins:
-        channel["data"] = float(channel["data"])
-        
-        for sample in channel["samples"]:
-            sample["value"] = random.uniform(.9, 1.1)*float(sample["value"])
-        pass
-
-    return (fit_dict, fitted_bins)
-'''
 
 def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     """ 
@@ -194,8 +148,6 @@ def MakeFittedValDictFromFitResult(result):
         fit_result_list.append(param_dict)
 
     return fit_result_list
-
-
 
 
 if __name__ == '__main__':
