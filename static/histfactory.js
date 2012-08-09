@@ -266,7 +266,7 @@ function DeleteSystematic() {
     return;
 }
 $(document).ready(function() {
-    $('.DeleteSystematicButton').live('click', DeleteSystematic)
+    $('.DeleteSystematicButton').live('click', DeleteSystematic);
 });
 
 
@@ -353,7 +353,7 @@ function DeleteSample() {
     return;
 }
 $(document).ready(function() {
-    $('.DeleteSampleButton').live('click', DeleteSample)
+    $('.DeleteSampleButton').live('click', DeleteSample);
 });
 
 
@@ -514,7 +514,7 @@ function AddNewChannel() {
 }
 // Attach this function to the proper button
 $(document).ready(function() {
-    $('#NewChannel').live('click', AddNewChannel)
+    $('#NewChannel').live('click', AddNewChannel);
 });
 
 
@@ -565,7 +565,7 @@ function AddSystematicToSample(sample) {
 }
 $(document).ready(function() {
     $('.NewSystematic').live('click', function(){
-	AddSystematicToSample( $(this).parent() );
+	AddSystematicToSample($(this).parent());
 	MakePlot();
 	CacheInfo();
     })
@@ -737,7 +737,7 @@ function MakePlot() {
 // Attach this function to the proper button
 $(document).ready(function() {
     $('#update_button').live('click', function() {
-	MakePlot;
+	MakePlot();
         CacheInfo();
     });
 });
@@ -786,8 +786,8 @@ function FitMeasurement() {
 	    // Make the fitted plot
 	    var fitted_bins = data["fitted_bins"];
 	    console.log(fitted_bins);
-	    MakePlotFromMeasurement(fitted_bins);
-	    CacheInfo();
+	    // MakePlotFromMeasurement(fitted_bins);
+	    // CacheInfo();
 
 	    // Print the fitted values
 	    console.log("Fitted Values:");
@@ -806,7 +806,10 @@ function FitMeasurement() {
 
 }
 $(document).ready(function() {
-    $('#fit_button').live('click', FitMeasurement)
+    $('#fit_button').live('click', function() {
+	CacheInfo();
+	FitMeasurement();
+    });
 });
 
 
