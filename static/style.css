@@ -74,6 +74,15 @@ footer
   border: 1px solid black;
   background-color: #E77471;
   }
+#lumi_uncertainty
+{  
+width: 40px;
+}
+#NewChannel
+{ 
+  margin-left: auto;
+  margin-right: auto;
+ }
 
 
 #Channel_List 
