@@ -559,6 +559,8 @@ $(document).ready(function() {
 function AddErrorsToData(sample_dict) {
     // See : http://code.google.com/p/flot/issues/attachmentText?id=215&aid=5246971771003358806&name=errorbars-example.html&token=YI9opDwFPKnW3XKeWqBtc3y0t_s%3A1344311014277
 
+    var MaxVal = 0.0;
+
     var data = sample_dict['data'];
     for(var chan_itr=0; chan_itr<data.length; ++chan_itr) {
 	var y_val = data[chan_itr][1];
@@ -567,6 +569,10 @@ function AddErrorsToData(sample_dict) {
 	data[chan_itr].push(.5); // x
 	data[chan_itr].push(error); // y
 	data[chan_itr].push(error); // y
+
+	// Be sure to add floats and not strings
+	// lol wat?  Thanks javascript :( 
+	MaxVal = Math.max(MaxVal, parseFloat(y_val)+parseFloat(error));
     }
     
     // Configure the appearence of points and error-bars
@@ -578,6 +584,8 @@ function AddErrorsToData(sample_dict) {
 	yerr: {show: true, color: "black", upperCap: "-", lowerCap: "-", asymmetric: true}
     };
     sample_dict['points'] = data_points;
+
+    return MaxVal;
 
 }
 
@@ -623,7 +631,10 @@ function MakePlotFromMeasurement(measurement) {
 	data_values.push([channel_idx,channel.data]);
     }
     data_dict["data"] = data_values;
-    AddErrorsToData(data_dict); // root(n)
+
+    // Add errors and get max height
+    var MaxVal = AddErrorsToData(data_dict); // root(n)
+    console.log("Max value from data: " + MaxVal);
     all_sample_data.push(data_dict);
 
 
@@ -657,7 +668,8 @@ function MakePlotFromMeasurement(measurement) {
 	    
 	    if(channel_has_sample) {
 		var sample = channel.samples[samples_in_chan_itr];
-		var channel_sample_val = sample["value"]; //channel[sample_name];
+		var channel_sample_val = sample["value"];
+		MaxVal = Math.max(MaxVal, channel_sample_val);
 		console.log("Found data for channel: " + channel["name"] 
 			    + " and sample: " + sample_name + ": " 
 			    + channel_sample_val); 
@@ -685,6 +697,7 @@ function MakePlotFromMeasurement(measurement) {
 		 bars: {show: true, barWidth: 1.0, align: 'center', lineWidth: 0.0}
 		},
 	xaxis: {ticks: axis_labels},
+	yaxis: {max: MaxVal*1.2},
 	zoom: {interactive: true}, pan: {interactive: true}
     };
 
