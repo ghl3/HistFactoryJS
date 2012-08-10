@@ -68,7 +68,7 @@ footer
   color: black;
   display: inline-block;
   width: 260px;
-  float: top;
+  /*float: top;*/
   vertical-align:text-top;
   /*float: left;*/
   border: 1px solid black;
@@ -167,7 +167,7 @@ footer
 {
   display: inline-block;
   width: 260px;
-  float: top;
+  /*float: top;*/
   vertical-align:text-top;
   /*float: left;*/
   border: 1px solid black;
@@ -186,7 +186,7 @@ footer
 }
 
 
-/* Misc html stuff */)
+/* Misc html stuff */
 p { text-indent: 3em; }
 
 h1 h2 h3 h4 
