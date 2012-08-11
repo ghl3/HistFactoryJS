@@ -456,7 +456,9 @@ function CreateFittedValueDOMTable(fitted_param_list){
     var cell = row.insertCell(1);
     cell.innerHTML = "Fitted Val";
     var cell = row.insertCell(2);
-    cell.innerHTML = "Error";
+    cell.innerHTML = "Error Lo";
+    var cell = row.insertCell(3);
+    cell.innerHTML = "Error Hi";
 
     for(var param_itr=0; param_itr<fitted_param_list.length; ++param_itr) {
 	var dict = fitted_param_list[param_itr];
@@ -469,7 +471,10 @@ function CreateFittedValueDOMTable(fitted_param_list){
 	cell.innerHTML = dict['val'].toPrecision(4);
 	cell.width='100px';
 	var cell = row.insertCell(2);
-	cell.innerHTML = dict['error'].toPrecision(4);
+	cell.innerHTML = dict['errorLo'].toPrecision(4);
+	cell.width='100px';
+	var cell = row.insertCell(3);
+	cell.innerHTML = dict['errorHi'].toPrecision(4);
 	cell.width='100px';
     }
     

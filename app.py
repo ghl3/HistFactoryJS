@@ -101,9 +101,10 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     # Get the name of the sample
     # that is interpreted as signal
     signal_sample = str(measurement_info["signal_name"])
+    SigmaVarName = "Sigma_" + signal_sample + "_OverSM"; 
 
     meas = ROOT.RooStats.HistFactory.Measurement("meas", "meas")
-    meas.SetPOI( "SigXsecOverSM" )
+    meas.SetPOI( SigmaVarName )
     meas.SetLumi( 1.0 )
     meas.SetLumiRelErr( float(measurement_info["lumi_uncertainty"]) )
     meas.SetExportOnly( False )
@@ -120,7 +121,7 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
                 sample.AddOverallSys( str(syst["name"]),  float(syst["FracDown"]), float(syst["FracUp"]) )
             sample.SetValue( float(sample_dict['value']) )
             if sample_name == signal_sample:
-                sample.AddNormFactor( "SigXsecOverSM", 1, 0, 3 )
+                sample.AddNormFactor( SigmaVarName, 1, 0, 3 )
             chan.AddSample( sample )
         
         meas.AddChannel( chan )
@@ -135,13 +136,15 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     constrainedParams = combined_config.GetNuisanceParameters();
     POIs = combined_config.GetParametersOfInterest();
     
+    # RooCmdArg("Minos",kTRUE,0,0,0,0,0,&minosArgs,0)
+
     model = combined_config.GetPdf();
-    fit_result = model.fitTo(simData, ROOT.RooCmdArg("Minos",True), 
+    fit_result = model.fitTo(simData, ROOT.RooCmdArg("Minos",True,0,0,0,"","",ROOT.RooArgSet(wspace.var(SigmaVarName)),0), 
                              ROOT.RooCmdArg("PrintLevel",1), 
                              ROOT.RooCmdArg("Save",True));
 
     # Get the Likelihood curve
-    POI = wspace.var("SigXsecOverSM")
+    POI = wspace.var(SigmaVarName)
     png_string = CreateProfileLikelihoodPlot(model, simData, POI)
 
     # Get the Fitted Bins
