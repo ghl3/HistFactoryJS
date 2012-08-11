@@ -776,6 +776,19 @@ function FitMeasurement() {
 	    var table_element = CreateFittedValueDOMTable(data['fitted_params']);
 	    $('#fitted_table').replaceWith(table_element);
 	    $('#fitted_table').show();
+
+	    // Show the Profile Likelihood
+	    var profile_png = data["profile_png"];
+	    console.log("Found Profile Likelihood png:");
+	    console.log(profile_png);
+
+	    var profile_img = new Image();
+	    profile_img.src = profile_png;
+	    profile_img.width = "500px";
+	    $("profile_likelihood").append(profile_img);
+
+	    //$("#profile_likelihood").html('<img alt="profile_likelihood" src="' + profile_png + '">');
+
 	}
     }
 

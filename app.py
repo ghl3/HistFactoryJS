@@ -48,7 +48,7 @@ def FitMeasurement():
     measurement_dict = json.loads( measurement_string_JSON )
 
     # Get the RooFitResult and the Fitted Value Dict
-    (fit_result, fitted_bins) = CreateHistFactoryFromMeasurement(measurement_dict)    
+    (fit_result, fitted_bins, profile_png) = CreateHistFactoryFromMeasurement(measurement_dict)    
     fitted_params = MakeFittedValDictFromFitResult(fit_result)
 
     print "Fitted Bins: ", fitted_bins
@@ -71,7 +71,9 @@ def FitMeasurement():
     #del fit_result
 
     # Success
-    return jsonify(flag="success", fitted_params=fitted_params, fitted_bins=fitted_measurement)
+    return jsonify(flag="success", 
+                   fitted_params=fitted_params, fitted_bins=fitted_measurement, 
+                   profile_png=profile_png)
 
 
 def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
@@ -135,15 +137,42 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     model = combined_config.GetPdf();
     fit_result = model.fitTo(simData, ROOT.RooCmdArg("Minos",True), ROOT.RooCmdArg("PrintLevel",1), ROOT.RooCmdArg("Save",True));
 
+    # Get the Likelihood curve
+    POI = wspace.var("SigXsecOverSM")
+    png_string = CreateProfileLikelihoodPlot(model, simData, POI)
+    print png_string
+
+
     fitted_bins = getFittedBinHeights(combined_config, simData)
 
     # Delete the model
     wspace.IsA().Destructor( wspace )
     meas.IsA().Destructor( meas )
 
+    return (fit_result, fitted_bins, png_string)
 
-    return (fit_result, fitted_bins)
 
+def CreateProfileLikelihoodPlot(model, data, poi):
+    """ Save a ProfileLikelihood curve given a model and parameter
+
+    """
+
+    nll = model.createNLL(data);
+    profile = nll.createProfile(ROOT.RooArgSet(poi));       
+
+    frame = poi.frame();
+    ROOT.RooStats.HistFactory.FormatFrameForLikelihood(frame)
+
+    canvas = ROOT.TCanvas( "Profile Likelihood", "", 800,600);
+    nll.plotOn(frame, ROOT.RooCmdArg("ShiftToZero",True), ROOT.RooCmdArg("LineColor",ROOT.kRed), ROOT.RooCmdArg("LineStyle",ROOT.kDashed) );
+    profile.plotOn(frame);
+    frame.SetMinimum(0);
+    frame.SetMaximum(2.);
+    frame.Draw("goff");
+    #canvas.SaveAs( plot_name );
+    png_string = CanvasToPngString(canvas)
+    return png_string
+    
 
 def MakeFittedValDictFromFitResult(result):
     """ Given a RooFitResult, find the fitted parameters
@@ -267,6 +296,27 @@ def getFittedBinHeights(model_config, data):
 
     return fitted_bin_heights
 
+
+def CanvasToPngString(canvas):
+    """ Return a string representing the png of a TCanvas
+
+    We do this by running a subprocess where we print the canvas
+    and then pipe the subprocess' stdout to our return string.
+    (Hold on to your butts)
+
+    """
+
+    temp_file_name = "temp_io.png"
+    canvas.Print(temp_file_name)    
+    image = open(temp_file_name, 'r')
+
+    data_uri = image.read().encode("base64")
+    img_html_src = "data:image/png;base64,%s" % data_uri
+
+    image.close()
+    os.remove(temp_file_name)
+
+    return img_html_src
 
 
 
