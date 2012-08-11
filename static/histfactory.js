@@ -2,7 +2,7 @@
 $(document).ready(function() {
     console.log("Document Ready");
 
-    $("#fitted_table").hide();
+    $("#fit_results").hide();
     LoadCacheInfo();
 
 });
@@ -720,7 +720,7 @@ $(document).ready(function() {
     $('#update_button').live('click', function() {
 	MakePlot();
         CacheInfo();
-	$("#fitted_table").hide();
+	$("#fit_results").hide();
     });
 });
 
@@ -775,18 +775,22 @@ function FitMeasurement() {
 	    console.log(data['fitted_params']);
 	    var table_element = CreateFittedValueDOMTable(data['fitted_params']);
 	    $('#fitted_table').replaceWith(table_element);
-	    $('#fitted_table').show();
 
 	    // Show the Profile Likelihood
 	    var profile_png = data["profile_png"];
 	    console.log("Found Profile Likelihood png:");
 	    console.log(profile_png);
+	    $("#profile_likelihood").attr("src", profile_png);
 
+	    // Show the info
+	    $('#fit_results').show();
+
+	    /*
 	    var profile_img = new Image();
 	    profile_img.src = profile_png;
 	    profile_img.width = "500px";
 	    $("profile_likelihood").append(profile_img);
-
+            */
 	    //$("#profile_likelihood").html('<img alt="profile_likelihood" src="' + profile_png + '">');
 
 	}

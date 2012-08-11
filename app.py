@@ -19,6 +19,7 @@ import copy
 app = Flask(__name__)
 
 ROOT.SetMemoryPolicy( ROOT.kMemoryStrict )
+ROOT.gROOT.SetBatch(True)
 
 @app.route('/')
 def index():
@@ -135,14 +136,15 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     POIs = combined_config.GetParametersOfInterest();
     
     model = combined_config.GetPdf();
-    fit_result = model.fitTo(simData, ROOT.RooCmdArg("Minos",True), ROOT.RooCmdArg("PrintLevel",1), ROOT.RooCmdArg("Save",True));
+    fit_result = model.fitTo(simData, ROOT.RooCmdArg("Minos",True), 
+                             ROOT.RooCmdArg("PrintLevel",1), 
+                             ROOT.RooCmdArg("Save",True));
 
     # Get the Likelihood curve
     POI = wspace.var("SigXsecOverSM")
     png_string = CreateProfileLikelihoodPlot(model, simData, POI)
-    print png_string
 
-
+    # Get the Fitted Bins
     fitted_bins = getFittedBinHeights(combined_config, simData)
 
     # Delete the model
@@ -163,11 +165,14 @@ def CreateProfileLikelihoodPlot(model, data, poi):
     frame = poi.frame();
     ROOT.RooStats.HistFactory.FormatFrameForLikelihood(frame)
 
-    canvas = ROOT.TCanvas( "Profile Likelihood", "", 800,600);
-    nll.plotOn(frame, ROOT.RooCmdArg("ShiftToZero",True), ROOT.RooCmdArg("LineColor",ROOT.kRed), ROOT.RooCmdArg("LineStyle",ROOT.kDashed) );
+
+    nll.plotOn(frame, ROOT.RooCmdArg("ShiftToZero",True), 
+               ROOT.RooCmdArg("LineColor",ROOT.kRed), 
+               ROOT.RooCmdArg("LineStyle",ROOT.kDashed) );
     profile.plotOn(frame);
     frame.SetMinimum(0);
     frame.SetMaximum(2.);
+    canvas = ROOT.TCanvas( "Profile Likelihood", "", 800,600);
     frame.Draw("goff");
     #canvas.SaveAs( plot_name );
     png_string = CanvasToPngString(canvas)
