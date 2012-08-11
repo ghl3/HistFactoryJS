@@ -100,14 +100,39 @@ width: 40px;
   margin-bottom: 30px;
   }
 
-#fitted_table
-{ 
-  margin-left: auto;
-  margin-right: auto;
+#fit_results
+{  
   text-align: center;
-  border: 1px solid black;
+  vertical-align: text-top;
   margin-bottom: 30px;
 }
+#fitted_table
+{ 
+/*
+  margin-left: auto;
+  margin-right: auto;
+*/
+  display: inline-block;
+  vertical-align: middle;  
+  /*float: left;*/
+  /*height: 200px;*/ 
+  /*width: 400px;*/
+  text-align: center;
+  border: 1px solid black;
+}
+/*tr
+{
+margin-left: auto;
+margin-right: auto;
+}*/
+#profile_likelihood
+{ 
+   display: inline-block;
+  vertical-align: middle;  
+  /*float: left;*/
+  width: 400px;
+ }
+
 
 /* The Classes */
 .sample

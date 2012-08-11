@@ -446,6 +446,8 @@ function CreateFittedValueDOMTable(fitted_param_list){
     var table = document.createElement('table');
     table.setAttribute('id', 'fitted_table');
 
+    // var table = $("#fittted_table");
+
     // Add the Title
     var row = table.insertRow(0);
 
