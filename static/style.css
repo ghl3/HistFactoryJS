@@ -252,6 +252,14 @@ a:active { color: #900; text-decoration: underline; background-color: transparen
 .nicebutton:hover{ color:#0066CC; }
 
 
+/* Hide input type=number ugliness: */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button 
+{
+  /* display: none; <- Crashes Chrome on hover */
+  webkit-appearance: none;
+  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  }
 
 /* Some Histogram Stuff
 .bars rect {

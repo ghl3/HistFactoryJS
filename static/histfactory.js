@@ -7,6 +7,38 @@ $(document).ready(function() {
 
 });
 
+
+// Function to determine if an input
+// Then, use it for validation on numeric inputs
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+$(document).ready(function() {
+    $('.numeric').live('input propertychange', function() {
+	if( !isNumber($(this).val()) ) {
+	    alert("Can only enter a numeric value ");
+	    return false;
+	}
+	return true;
+    });
+});
+
+
+function hasWhiteSpace(s) {
+    return s.indexOf(' ') >= 0;
+}
+$(document).ready(function() {
+    $('input:not(.numeric)').live('input propertychange', function() {
+	if( hasWhiteSpace($(this).val()) ) {
+	    alert("No White Space allowed");
+	    return false;
+	}
+	return true;
+    });
+});
+
+
+
 // Define the "systematic' class
 function Systematic(name, FracUp, FracDown) {
     this.name = name;
@@ -219,7 +251,8 @@ function CreateDOMFromSystematic(systematic) {
     // Add the 'FracUp' input field
     var systematic_FracUp = document.createElement('input');
     systematic_FracUp.setAttribute('type',"text");
-    systematic_FracUp.setAttribute('class',"systematic_FracUp");
+    //systematic_FracUp.setAttribute('type',"number");
+    systematic_FracUp.setAttribute('class',"systematic_FracUp numeric");
     systematic_FracUp.setAttribute('value', systematic.FracUp );
     systematic_element.innerHTML += "Up:";
     systematic_element.appendChild( systematic_FracUp );
@@ -227,7 +260,8 @@ function CreateDOMFromSystematic(systematic) {
     // Add the 'FracDown' input field
     var systematic_FracDown = document.createElement('input');
     systematic_FracDown.setAttribute('type',"text");
-    systematic_FracDown.setAttribute('class',"systematic_FracDown");
+    //systematic_FracDown.setAttribute('type',"number");
+    systematic_FracDown.setAttribute('class',"systematic_FracDown numeric");
     systematic_FracDown.setAttribute('value', systematic.FracDown );
     systematic_element.innerHTML += "Down:";
     systematic_element.appendChild( systematic_FracDown );
@@ -281,7 +315,8 @@ function CreateDOMFromSample(sample) {
     // Add the 'value' input field
     var sample_value = document.createElement('input');
     sample_value.setAttribute('type',"text");
-    sample_value.setAttribute('class',"sample_value");
+    //sample_value.setAttribute('type',"number");
+    sample_value.setAttribute('class',"sample_value numeric");
     sample_value.setAttribute('value', sample.value );
     sample_element.innerHTML += "Value:";
     sample_element.appendChild( sample_value );
@@ -383,7 +418,8 @@ function CreateDOMFromChannel(channel) {
     // Add the 'data' input field
     var channel_data = document.createElement('input');
     channel_data.setAttribute('type',"text");
-    channel_data.setAttribute('class',"channel_data");
+    //channel_data.setAttribute('type',"number");
+    channel_data.setAttribute('class',"channel_data numeric");
     channel_data.setAttribute('value', channel.data );
     new_channel.innerHTML += "Data:";
     new_channel.appendChild( channel_data );
