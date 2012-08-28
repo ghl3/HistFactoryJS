@@ -25,7 +25,8 @@ def index():
 
 @app.route('/FitMeasurement', methods=['GET', 'POST'])
 def FitMeasurement():
-    return tools.ProcessMeasurementRequestParallel(request)
+    #return tools.ProcessMeasurementRequestParallel(request)
+    return tools.ProcessMeasurementRequest(request)
 
 #FitMeasurementMultiprocess
 

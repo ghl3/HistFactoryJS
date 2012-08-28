@@ -84,6 +84,10 @@ def ProcessMeasurementRequest(request):
 
     fitted_params, fitted_bins, profile_png = FitMeasurement(measurement_dict)
 
+    print "fitted_params: ", fitted_params
+    print "fitted_bins: ", fitted_bins
+    print "profile_png: ", profile_png
+
     return jsonify(flag="success", 
                    fitted_params=fitted_params, fitted_bins=fitted_bins,
                    profile_png=profile_png)
