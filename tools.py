@@ -10,6 +10,9 @@ from flask import jsonify
 
 import ROOT
 
+import subprocess
+#from multiprocessing import Pool
+
 """
 This module implements the functions that
 receive http requests. 
@@ -20,15 +23,53 @@ the local app defined in this module
 
 """
 
-def FitMeasurement(request):
+def ProcessMeasurementRequestParallel(request):
+    """ Open a new system process to process the measurment request
+
+
+    """
+
+    print "Processing in Parallel"
+
+    # Apply some sanity checks
+    if request.method != 'POST':
+        print "FitMeasurement() - ERROR: Expected POST http request"
+        return jsonify(flag="error")
+
+    # Get the data to be fit from the JSON
+    measurement_string_JSON = request.form['measurement']
+    #measurement_dict = json.loads( measurement_string_JSON )
+
+    # Call the external script
+    p = subprocess.Popen(["./fitMeasurement.py", measurement_string_JSON], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+
+    # Use the deliminator to determine where
+    # the desired dict is in the output
+    delim = 'BEGIN_HERE'
+    out = out[out.find(delim)+len(delim):]
+    json_string = out
+    result_json = json.loads(json_string)
+
+    fitted_params = result_json['fitted_params'] 
+    fitted_bins = result_json['fitted_bins'] 
+    profile_png = result_json['profile_png']
+
+    print "fitted_params: ", fitted_params
+    print "fitted_bins: ", fitted_bins
+    print "profile_png: ", profile_png
+    
+    return jsonify(flag="success", 
+                   fitted_params=fitted_params, fitted_bins=fitted_bins,
+                   profile_png=profile_png)
+
+
+def ProcessMeasurementRequest(request):
     """ Take a POST http request and return fit info to client javascript
 
-    Given a JSON measurement string, create a result that contains:
-
-    - A list of fitted values for parameters (for a table)
-    - A list of fitted bin heights (for plotting)
-
-    Include a success flag in the return object
+    Check that the request is a POST
+    Extract the 'measurement' dictionary from the request form
+    Pass it to the FitMeasurement method and return the result
 
     """
 
@@ -40,6 +81,28 @@ def FitMeasurement(request):
     # Get the data to be fit from the JSON
     measurement_string_JSON = request.form['measurement']
     measurement_dict = json.loads( measurement_string_JSON )
+
+    fitted_params, fitted_bins, profile_png = FitMeasurement(measurement_dict)
+
+    return jsonify(flag="success", 
+                   fitted_params=fitted_params, fitted_bins=fitted_bins,
+                   profile_png=profile_png)
+
+
+    
+
+def FitMeasurement(measurement_dict):
+    """ Build a model and fit based on a measurement_dict
+    
+    Given a JSON-style measurement string, 
+    create a result that contains:
+
+    - A list of fitted values for parameters (for a table)
+    - A list of fitted bin heights (for plotting)
+
+    Include a success flag in the return object
+
+    """
 
     # Get the RooFitResult and the Fitted Value Dict
     (fit_result, fitted_bins, profile_png) = CreateHistFactoryFromMeasurement(measurement_dict)    
@@ -56,18 +119,14 @@ def FitMeasurement(request):
         for sample in channel["samples"]:
             sample_name = sample["name"]
             sample["value"] = fitted_bins[channel_name][sample_name]
-            #random.uniform(.9, 1.1)*float(sample["value"])
         pass
 
     # Clean Up
     fit_result.IsA().Destructor( fit_result )
     #fit_result.Delete()
     #del fit_result
-
-    # Success
-    return jsonify(flag="success", 
-                   fitted_params=fitted_params, fitted_bins=fitted_measurement, 
-                   profile_png=profile_png)
+    # params
+    return (fitted_measurement, fitted_bins, profile_png)
 
 
 

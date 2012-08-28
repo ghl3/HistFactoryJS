@@ -504,13 +504,13 @@ function CreateFittedValueDOMTable(fitted_param_list){
 	cell.innerHTML = dict['name'];
 	cell.width='60px';
 	var cell = row.insertCell(1);
-	cell.innerHTML = dict['val'].toPrecision(4);
+	cell.innerHTML = parseFloat(dict['val']).toPrecision(4);
 	cell.width='100px';
 	var cell = row.insertCell(2);
-	cell.innerHTML = dict['errorLo'].toPrecision(4);
+	cell.innerHTML = parseFloat(dict['errorLo']).toPrecision(4);
 	cell.width='100px';
 	var cell = row.insertCell(3);
-	cell.innerHTML = dict['errorHi'].toPrecision(4);
+	cell.innerHTML = parseFloat(dict['errorHi']).toPrecision(4);
 	cell.width='100px';
     }
     
