@@ -11,7 +11,7 @@ from flask import jsonify
 import ROOT
 
 import subprocess
-#from multiprocessing import Pool
+
 
 """
 This module implements the functions that
@@ -129,17 +129,8 @@ def FitMeasurement(measurement_dict):
 
     # Clean Up
     fit_result.IsA().Destructor( fit_result )
-    #fit_result.Delete()
-    #del fit_result
-    # params
-
-    #  return jsonify(flag="success",
-    #                 fitted_params=fitted_params, fitted_bins=fitted_measurement,
-    #                 profile_png=profile_png)
 
     return (fitted_params, fitted_bins, profile_png)
-
-
 
 
 def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
@@ -227,30 +218,6 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     return (fit_result, fitted_bins, png_string)
 
 
-def CreateProfileLikelihoodPlot(model, data, poi):
-    """ Save a ProfileLikelihood curve given a model and parameter
-
-    """
-
-    nll = model.createNLL(data);
-    profile = nll.createProfile(ROOT.RooArgSet(poi));       
-
-    frame = poi.frame();
-    ROOT.RooStats.HistFactory.FormatFrameForLikelihood(frame)
-
-
-    nll.plotOn(frame, ROOT.RooCmdArg("ShiftToZero",True), 
-               ROOT.RooCmdArg("LineColor",ROOT.kRed), 
-               ROOT.RooCmdArg("LineStyle",ROOT.kDashed) );
-    profile.plotOn(frame);
-    frame.SetMinimum(0);
-    frame.SetMaximum(2.);
-    canvas = ROOT.TCanvas( "Profile Likelihood", "", 800,600);
-    frame.Draw("goff");
-    png_string = CanvasToPngString(canvas)
-    return png_string
-    
-
 def MakeFittedValDictFromFitResult(result):
     """ Given a RooFitResult, find the fitted parameters
     as well as their errors as a list of dictionaries
@@ -276,15 +243,13 @@ def MakeFittedValDictFromFitResult(result):
 
 
 def getFittedBinHeights(model_config, data):
-    """
-    This is just a place-holder module
-    to get the fitted bin heights from a 
-    histfactory model
+    """ Get the fitted bin heights 
 
-    It will be incorproated into app.py
-    when (if) it works...
-    """
+    Take the pdf in the model_config, 
+    when fitted to data, and return a dictionary
+    of the bin heights
 
+    """
 
     modelPdf = model_config.GetPdf();
     
@@ -316,15 +281,6 @@ def getFittedBinHeights(model_config, data):
         channelPdfVec.append(pdftmp)
         channelObservVec.append(obstmp)
         channelNameVec.append(tt.GetName())
-        '''
-        continue
-
-        dataHistName = str("hData_" + tt.GetName())
-        obs = obstmp.first()
-        dataHist = dataForChan.RooAbsData.createHistogram("myDataHist", obs)
-        #dataHist = dataForChan.createHistogram("myDataHist"dataHistName, obs)
-        channelDataVec.append(dataHist)
-        '''
 
     channelSumNodeVec=[]
 
@@ -345,7 +301,6 @@ def getFittedBinHeights(model_config, data):
                 break
             pass
         pass
-    
 
     # Make the dictionary to be returned
     fitted_bin_heights = {}
@@ -372,6 +327,29 @@ def getFittedBinHeights(model_config, data):
         pass
 
     return fitted_bin_heights
+
+
+def CreateProfileLikelihoodPlot(model, data, poi):
+    """ Save a ProfileLikelihood curve given a model and parameter
+
+    """
+
+    nll = model.createNLL(data);
+    profile = nll.createProfile(ROOT.RooArgSet(poi));       
+
+    frame = poi.frame();
+    ROOT.RooStats.HistFactory.FormatFrameForLikelihood(frame)
+
+    nll.plotOn(frame, ROOT.RooCmdArg("ShiftToZero",True), 
+               ROOT.RooCmdArg("LineColor",ROOT.kRed), 
+               ROOT.RooCmdArg("LineStyle",ROOT.kDashed) );
+    profile.plotOn(frame);
+    frame.SetMinimum(0);
+    frame.SetMaximum(2.);
+    canvas = ROOT.TCanvas( "Profile Likelihood", "", 800,600);
+    frame.Draw("goff");
+    png_string = CanvasToPngString(canvas)
+    return png_string
 
 
 def CanvasToPngString(canvas):

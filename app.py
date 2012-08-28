@@ -11,8 +11,6 @@ from flask import jsonify
 import ROOT
 
 import tools
-from multi import FitMeasurementMultiprocess
-
 
 app = Flask(__name__)
 
@@ -26,12 +24,7 @@ def index():
 @app.route('/FitMeasurement', methods=['GET', 'POST'])
 def FitMeasurement():
     return tools.ProcessMeasurementRequestParallel(request)
-    #return tools.ProcessMeasurementRequest(request)
 
-#FitMeasurementMultiprocess
-
-#FitMeasurement = app.route('/FitMeasurement', methods=['GET', 'POST'])(tools.FitMeasurement)
-#print FitMeasurement
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
