@@ -23,46 +23,6 @@ the local app defined in this module
 
 """
 
-def ProcessMeasurementRequestParallel(request):
-    """ Open a new system process to process the measurment request
-
-
-    """
-
-    print "Processing in Parallel"
-
-    # Apply some sanity checks
-    if request.method != 'POST':
-        print "FitMeasurement() - ERROR: Expected POST http request"
-        return jsonify(flag="error")
-
-    # Get the data to be fit from the JSON
-    measurement_string_JSON = request.form['measurement']
-    #measurement_dict = json.loads( measurement_string_JSON )
-
-    # Call the external script
-    p = subprocess.Popen(["./fitMeasurement.py", measurement_string_JSON], stdout=subprocess.PIPE)
-    out, err = p.communicate()
-
-    # Use the deliminator to determine where
-    # the desired dict is in the output
-    delim = 'BEGIN_HERE'
-    out = out[out.find(delim)+len(delim):]
-    json_string = out
-    result_json = json.loads(json_string)
-
-    fitted_params = result_json['fitted_params'] 
-    fitted_bins = result_json['fitted_bins'] 
-    profile_png = result_json['profile_png']
-
-    print "fitted_params: ", fitted_params
-    print "fitted_bins: ", fitted_bins
-    print "profile_png: ", profile_png
-    
-    return jsonify(flag="success", 
-                   fitted_params=fitted_params, fitted_bins=fitted_bins,
-                   profile_png=profile_png)
-
 
 def ProcessMeasurementRequest(request):
     """ Take a POST http request and return fit info to client javascript
@@ -93,11 +53,53 @@ def ProcessMeasurementRequest(request):
                    profile_png=profile_png)
 
 
-    
+def ProcessMeasurementRequestParallel(request):
+    """ Open a new system process to process the measurment request
+
+    Take the input request, 
+    send it to the 'fitMeasurement.py' script as a json
+    string through the command line, 
+    get the std::cout return and parse it, 
+    and return the response as a json string
+    """
+
+    print "Processing in Parallel"
+
+    # Apply some sanity checks
+    if request.method != 'POST':
+        print "FitMeasurement() - ERROR: Expected POST http request"
+        return jsonify(flag="error")
+
+    # Get the data to be fit from the JSON
+    measurement_string_JSON = request.form['measurement']
+
+    # Call the external script
+    p = subprocess.Popen(["./fitMeasurement.py", measurement_string_JSON], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+
+    # Use the deliminator to determine where
+    # the desired dict is in the output
+    delim = 'BEGIN_HERE'
+    out = out[out.find(delim)+len(delim):]
+    json_string = out
+    result_json = json.loads(json_string)
+
+    fitted_params = result_json['fitted_params'] 
+    fitted_bins = result_json['fitted_bins'] 
+    profile_png = result_json['profile_png']
+
+    return jsonify(flag="success", 
+                   fitted_params=fitted_params, fitted_bins=fitted_bins,
+                   profile_png=profile_png)
+
 
 def FitMeasurement(measurement_dict):
     """ Build a model and fit based on a measurement_dict
     
+    The input measurement_dict has the following form:
+    {'channel_list' : [{channel_a_dict}, {channel_b_dict}, {channel_c_dict}],
+     'measurement_info' : {} }
+
     Given a JSON-style measurement string, 
     create a result that contains:
 
@@ -109,20 +111,20 @@ def FitMeasurement(measurement_dict):
     """
 
     # Get the RooFitResult and the Fitted Value Dict
-    (fit_result, fitted_bins, profile_png) = CreateHistFactoryFromMeasurement(measurement_dict)    
+    (fit_result, fitted_bin_values, profile_png) = CreateHistFactoryFromMeasurement(measurement_dict)    
     fitted_params = MakeFittedValDictFromFitResult(fit_result)
 
-    print "Fitted Bins: ", fitted_bins
+    print "Fitted Bins: ", fitted_bin_values
 
     # Copy the original measurement, and then we will modify
     # the sample values
-    fitted_measurement = copy.deepcopy(measurement_dict["channel_list"])
+    fitted_bins = copy.deepcopy(measurement_dict["channel_list"])
 
-    for channel in fitted_measurement:
+    for channel in fitted_bins:
         channel_name = channel["name"]
         for sample in channel["samples"]:
             sample_name = sample["name"]
-            sample["value"] = fitted_bins[channel_name][sample_name]
+            sample["value"] = fitted_bin_values[channel_name][sample_name]
         pass
 
     # Clean Up
@@ -135,7 +137,7 @@ def FitMeasurement(measurement_dict):
     #                 fitted_params=fitted_params, fitted_bins=fitted_measurement,
     #                 profile_png=profile_png)
 
-    return (fitted_params, fitted_measurement, profile_png)
+    return (fitted_params, fitted_bins, profile_png)
 
 
 
