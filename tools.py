@@ -149,14 +149,19 @@ def CreateHistFactoryFromMeasurement(measurement_dict, options=None):
     and systematics.
 
     The input object looks like this:
-    
-    [ {name:"MyChannelA", data:"35", samples:[{name:"ttbar", value:12}, {name:"WJets", value:20] }, 
-      {name:"MyChannelB", data:"40", samples:[{name:"ttbar", value:18}, {name:"WJets", value:23] }, 
-    ...
-    ]
+    {'channel_list' :  [ {name:"MyChannelA", data:"35", samples:[{name:"ttbar", value:12}, {name:"WJets", value:20] }, 
+                         {name:"MyChannelB", data:"40", samples:[{name:"ttbar", value:18}, {name:"WJets", value:23] }, 
+                         ... ],
+    'measurement_info' : {lumi_uncertainty: "0.036", signal_name: "ttbar"} }
 
-    Create the HistFactory object, make a workspace, fit
-    the workspace, and return the RooFitResult
+
+    Create the HistFactory object, 
+    make a workspace, 
+    fit the workspace, 
+    get the fitted parameters, 
+    get the roofitresult,
+    and get the likelihood curve as a png string.
+    Return these guys.
 
     """
     
@@ -242,7 +247,6 @@ def CreateProfileLikelihoodPlot(model, data, poi):
     frame.SetMaximum(2.);
     canvas = ROOT.TCanvas( "Profile Likelihood", "", 800,600);
     frame.Draw("goff");
-    #canvas.SaveAs( plot_name );
     png_string = CanvasToPngString(canvas)
     return png_string
     
