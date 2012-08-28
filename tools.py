@@ -130,7 +130,12 @@ def FitMeasurement(measurement_dict):
     #fit_result.Delete()
     #del fit_result
     # params
-    return (fitted_measurement, fitted_bins, profile_png)
+
+    #  return jsonify(flag="success",
+    #                 fitted_params=fitted_params, fitted_bins=fitted_measurement,
+    #                 profile_png=profile_png)
+
+    return (fitted_params, fitted_measurement, profile_png)
 
 
 
