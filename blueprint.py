@@ -14,14 +14,15 @@ HistFactory = Blueprint('HistFactory', __name__,
                         template_folder='templates', 
                         static_folder="static")
 
-@simple_page.route('/', defaults={'index'})
+#defaults={'HistFactory': 'index'}
+@HistFactory.route('/')
 def index():
     try:
-        return render_template('index.html')
+        return render_template('hf.html')
     except TemplateNotFound:
         abort(404)
 
 
-@simple_page.route('/FitMeasurement')
-def index():
+@HistFactory.route('/FitMeasurement', defaults={'HistFactory': 'index'})
+def FitMeasurement():
     return tools.ProcessMeasurementRequestParallel(request)
