@@ -56,7 +56,7 @@ def ProcessMeasurementRequest(request):
                    profile_png=profile_png)
 
 
-def ProcessMeasurementRequestParallel(request):
+def ProcessMeasurementRequestParallel(request, base_dir='.'):
     """ Open a new system process to process the measurment request
 
     Take the input request, 
@@ -79,7 +79,8 @@ def ProcessMeasurementRequestParallel(request):
 
     # Call the external script
     print "Opening Subprocess"
-    p = subprocess.Popen(["./fitMeasurement.py", measurement_string_JSON], stdout=subprocess.PIPE)
+    script_location = base_dir + '/' + 'fitMeasurement.py'
+    p = subprocess.Popen([script_location, measurement_string_JSON], stdout=subprocess.PIPE)
     out, err = p.communicate()
     print "Subprocess successfully executed"
 

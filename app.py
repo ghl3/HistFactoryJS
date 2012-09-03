@@ -23,7 +23,7 @@ def index():
 
 @app.route('/FitMeasurement', methods=['GET', 'POST'])
 def FitMeasurement():
-    return tools.ProcessMeasurementRequestParallel(request)
+    return tools.ProcessMeasurementRequestParallel(request, base_dir='.')
 
 
 if __name__ == '__main__':
