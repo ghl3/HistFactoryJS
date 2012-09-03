@@ -842,8 +842,7 @@ function FitMeasurement() {
     // Finally, we send it via AJAX to our
     // python (Flask) back end for processing
     console.log("Sending FitMeasurement http request (post via AJAX)");
-    //$.post( "/FitMeasurement", {measurement: meas_JSON_string}, successCallback );
-    $.post( "http://spontaneoussymmetry.com/FitHistFactoryMeasurement", {measurement: meas_JSON_string}, successCallback );
+    $.post( "/FitMeasurement", {measurement: meas_JSON_string}, successCallback );
     console.log("Successfully Sent FitMeasurement http request, waiting for callback");
 
 }
