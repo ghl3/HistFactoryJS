@@ -38,6 +38,9 @@ def ProcessMeasurementRequest(request):
         print "FitMeasurement() - ERROR: Expected POST http request"
         return jsonify(flag="error")
 
+    print "Processing MeasurementRequest:"
+    print request
+
     # Get the data to be fit from the JSON
     measurement_string_JSON = request.form['measurement']
     measurement_dict = json.loads( measurement_string_JSON )
@@ -63,7 +66,8 @@ def ProcessMeasurementRequestParallel(request):
     and return the response as a json string
     """
 
-    print "Processing in Parallel"
+    print "Processing RequestMeasurement in Parallel:"
+    print request, request.form
 
     # Apply some sanity checks
     if request.method != 'POST':
@@ -74,8 +78,10 @@ def ProcessMeasurementRequestParallel(request):
     measurement_string_JSON = request.form['measurement']
 
     # Call the external script
+    print "Opening Subprocess"
     p = subprocess.Popen(["./fitMeasurement.py", measurement_string_JSON], stdout=subprocess.PIPE)
     out, err = p.communicate()
+    print "Subprocess successfully executed"
 
     # Use the deliminator to determine where
     # the desired dict is in the output
@@ -88,6 +94,7 @@ def ProcessMeasurementRequestParallel(request):
     fitted_bins = result_json['fitted_bins'] 
     profile_png = result_json['profile_png']
 
+    print "Returning result"
     return jsonify(flag="success", 
                    fitted_params=fitted_params, fitted_bins=fitted_bins,
                    profile_png=profile_png)

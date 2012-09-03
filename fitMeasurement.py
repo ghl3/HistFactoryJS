@@ -6,8 +6,6 @@ import json
 
 import tools
 
-import ROOT
-ROOT.gROOT.SetBatch(True)
 
 def main():
     """ Create a measurement from a string
@@ -24,6 +22,16 @@ def main():
     (which could then be intercepted)
 
     """
+
+    # Import ROOT:
+    try:
+        import ROOT
+    except ImportError:
+        print "Error: Cannot import ROOT Module"
+        
+
+    # Set to batch mode
+    ROOT.gROOT.SetBatch(True)
 
     # Get the results using HistFactory
     measurement_dict = json.loads(sys.argv[1])
